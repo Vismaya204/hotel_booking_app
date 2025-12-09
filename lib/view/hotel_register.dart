@@ -18,6 +18,7 @@ class _HotelRegisterScreenState extends State<HotelRegisterScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController discount=TextEditingController();
+  final TextEditingController description=TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +43,7 @@ class _HotelRegisterScreenState extends State<HotelRegisterScreen> {
                   fontWeight: FontWeight.bold,
                   color: Colors.amber,
                 ),
-              ),
+              ),SizedBox(height: 30,),
               TextField(
                 style: TextStyle(color: Colors.white),
                 controller: hotelNameController,
@@ -86,6 +87,14 @@ class _HotelRegisterScreenState extends State<HotelRegisterScreen> {
                 decoration: InputDecoration(
                   hintText: "Password",
                   hintStyle: TextStyle(color: Colors.white),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),SizedBox(height: 10,),
+              TextField(controller:description ,maxLines: 4,
+                style: TextStyle(color: Colors.white),
+                decoration: InputDecoration(hintText: "Descritipon",hintStyle: TextStyle(color: Colors.white),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
@@ -151,17 +160,28 @@ class _HotelRegisterScreenState extends State<HotelRegisterScreen> {
                     ),
                     onPressed: () async {
                       final hotel = HotelAppModel(
-                        id: "",
+                        hotelId: "",
                         name: hotelNameController.text,
                         email: emailController.text,
                         password: passwordController.text,
                         location: locationController.text,
+                        discount: discount.text,
+                        description: description.text
                       );
 
                       await controller.hotelRegister(
                         hotel: hotel,
                         context: context,
                       );
+                        /// after success clear fields
+  hotelNameController.clear();
+  locationController.clear();
+  emailController.clear();
+  passwordController.clear();
+  discount.clear();
+  description.clear();
+
+ 
                     },
                     child: const Text("Register"),
                   ),

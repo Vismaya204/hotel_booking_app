@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:hotelbookingapp/view/addhoteldateils.dart';
+import 'package:hotelbookingapp/view/addroomdateils.dart';
 import 'package:hotelbookingapp/view/admin.dart';
-import 'package:hotelbookingapp/view/selectuserdate.dart';
+import 'package:hotelbookingapp/view/home.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -11,6 +11,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hotelbookingapp/model/model.dart';
 
 class HotelBookingController extends ChangeNotifier {
+  
+  
   final ImagePicker picker = ImagePicker();
 
   // State variables
@@ -51,7 +53,7 @@ class HotelBookingController extends ChangeNotifier {
     }
   }
 
-  /// Upload image
+  /// Upload hotel image
   /// Upload image to Cloudinary (works for both mobile & web)
   Future<String?> uploadImageToCloudinary() async {
     const cloudName = "dc0ny45w9"; // 🔹 replace with your Cloudinary cloud name
@@ -144,47 +146,74 @@ class HotelBookingController extends ChangeNotifier {
 
     return imageUrls;
   }
+//save room details
+ Future<void> saveRoomDetails({
+  required HotelAppModel room,
+  required BuildContext context,
+}) async {
+  try {
+    // Upload images first
+    List<String> imageUrls = await uploadRoomImagesToCloudinary();
 
-  /// Upload multiple room images to Cloudinary and save details in Firestore
-  Future<void> saveRoomDetails({
-    required String hotelId,
-    required String roomType,
-    required String floor,
-    required String price,
-    required String available,
-    required String description,
-    required BuildContext context,
-  }) async {
-    try {
-      List<String> imageUrls = await uploadRoomImagesToCloudinary();
+    // Create room data
+    final hoteladdroomData = {
+      "roomType": room.roomType ?? "",
+      "floor": room.floor ?? 0,
+      "price": room.price ?? 0,
+      "available": room.availableRoom ?? "",
+      "roomNumber": room.roomNumber ?? 0,
+      "images": imageUrls,
+      "createdAt": FieldValue.serverTimestamp(),
+    };
 
-      await FirebaseFirestore.instance
-          .collection("hotels")
-          .doc(hotelId)
-          .collection("rooms")
-          .add({
-            "roomType": roomType,
-            "floor": floor,
-            "price": price,
-            "description": description,
-            "available": available,
-            "images": imageUrls,
-            "createdAt": FieldValue.serverTimestamp(),
-          });
+    // Save under rooms collection
+    await FirebaseFirestore.instance
+        .collection("hotels")
+        .doc(room.hotelId)
+        .collection("rooms")
+        .add(hoteladdroomData);
 
-      roomImagesMobile.clear();
-      roomImagesWeb.clear();
-      notifyListeners();
+    roomImagesMobile.clear();
+    roomImagesWeb.clear();
+    notifyListeners();
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Room details saved successfully")),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Error saving room: $e")));
-    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Room details saved successfully")),
+    );
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Error saving room: $e")),
+    );
   }
+}
+
+Future<void> userRoombook({
+  required HotelAppModel userRoombooking,
+  required BuildContext context,
+}) async {
+  try {
+    String bookingId =
+        FirebaseFirestore.instance.collection("roomBookings").doc().id;
+
+    await FirebaseFirestore.instance
+        .collection("roomBookings")
+        .doc(bookingId)
+        .set({
+      ...userRoombooking.toMap(),
+      "bookingId": bookingId, // ensure booking ID saved
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Room booked successfully!")),
+    );
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Booking failed: $e")),
+    );
+  }
+}
+
+
 
   /// User Signup
   Future<void> usersignup({
@@ -205,7 +234,7 @@ class HotelBookingController extends ChangeNotifier {
             'id': userCredential.user!.uid,
             'username': user.name,
             'email': user.email,
-            "phonenumber": user.phonenumber,
+            "phonenumber": user.userPhoneNumber,
             'createdAt': FieldValue.serverTimestamp(),
           });
 
@@ -248,11 +277,12 @@ class HotelBookingController extends ChangeNotifier {
           .collection('hotels')
           .doc(hotelCredential.user!.uid)
           .set({
-            'id': hotelCredential.user!.uid,
+            'hotelId': hotelCredential.user!.uid,
             'name': hotel.name,
             'location': hotel.location,
             'image': imageUrl, // ✅ Cloudinary URL
             'email': hotel.email,
+            'description':hotel.description,
             "discount": hotel.discount,
             'status': 'pending',
             'createdAt': FieldValue.serverTimestamp(),
@@ -301,7 +331,7 @@ class HotelBookingController extends ChangeNotifier {
         ).showSnackBar(const SnackBar(content: Text("Admin login successful")));
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => Admin()),
+          MaterialPageRoute(builder: (context) => AdminDashboard()),
         );
         return;
       }
@@ -331,7 +361,7 @@ class HotelBookingController extends ChangeNotifier {
         ).showSnackBar(const SnackBar(content: Text("User login successful")));
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => HotelSearchScreen()),
+          MaterialPageRoute(builder: (context) => Home()),
         );
       } else if (hotelDoc.exists) {
         // ✅ Hotel login with admin approval check
@@ -344,9 +374,9 @@ class HotelBookingController extends ChangeNotifier {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) => AddHotelDetails(
-                hotelId: hotelDoc['id'],
-                hotelName: hotelDoc['name'],
+              builder: (context) => AddRoomScreen(
+                hotelId: hotelDoc['hotelId'],
+                
               ),
             ),
           );

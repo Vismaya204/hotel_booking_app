@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hotelbookingapp/view/alluserscreen.dart';
+import 'package:hotelbookingapp/view/home.dart';
 
 
 class HotelSearchScreen extends StatefulWidget {
@@ -26,13 +26,15 @@ final TextEditingController location=TextEditingController();
       body: Stack(
         children: [
           // Background Image
-          SizedBox(
-            width: double.infinity,
-            height: double.infinity,
-            child: Image.network("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRPmaRSgLbkrFHU264KUW6iP8Qmc__C2vy12Ynb9UquSJ1F9EAOVXhDLrc&s"
-             , // Replace with your image
-              fit: BoxFit.cover,
-            ),
+          Container(
+            
+              width: double.infinity,
+              height: 500,
+              child: Image.asset("assets/hotelblk.jpg"
+               , // Replace with your image
+                fit: BoxFit.cover,
+              ),
+            
           ),
 
           // White rounded container
@@ -252,7 +254,7 @@ final TextEditingController location=TextEditingController();
                       child: ElevatedButton(
                         onPressed: () { 
 
-                          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) =>Alluserscreen() ,));
+                          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) =>Home() ,));
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.blue,

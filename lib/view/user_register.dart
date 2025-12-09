@@ -68,11 +68,11 @@ class _UserRegisterState extends State<UserRegister> {
                   foregroundColor: Colors.black,
                 ),
                 onPressed: () {final usermodel=HotelAppModel(
-                  id:"",
+                  userId:"",
                   name: username.text,
                   email: email.text,
                   password: Password.text,
-                  phonenumber: int.tryParse(phonenumber.text),              
+                  userPhoneNumber: int.tryParse(phonenumber.text),              
                 );Provider.of<HotelBookingController>(context,listen: false).usersignup(
                   user: usermodel,
                   context: context,

@@ -1,85 +1,122 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class HotelAppModel {
-  final String id;
+  final String userId;     // for user signup
+  final String hotelId;    // for hotel / room
   final String name;
   final String email;
   final String password;
-  final int? phonenumber;
+
+  final String? location;
+  final int? userPhoneNumber;
   final double? price;
   final String? image;
-  final String? location;
-  final String? available;
-  final int? guest;
-  final DateTime?checkInDate;
+  final String? description;
+  final String? availableRoom;
 
-  final DateTime?checkOutDate;
-  final String? review;
-  final double? rating;
+  final int? guest;
+  final DateTime? checkInDate;
+  final DateTime? checkOutDate;
+
+  // final String? review;
+  // final double? rating;
+
+  final String? roomType;
+  final int? floor;
+   final int? roomNumber;
+  final int? roomscount;
   final String? discount;
+
   final DateTime? createdAt;
 
   HotelAppModel({
-    this.id = "",
+    this.userId = "",
+    this.hotelId = "",
     required this.name,
     required this.email,
     required this.password,
     this.location,
-    this.phonenumber,
-    this.review,
+    this.userPhoneNumber,
     this.price,
     this.image,
-    this.available,
+    this.description,
+    this.availableRoom,
     this.guest,
-    this.rating,
+    this.roomscount,
+    // this.review,
+    // this.rating,
+    this.roomType,
+    this.floor,
+    this.roomNumber,
     this.discount,
     this.checkInDate,
     this.checkOutDate,
     this.createdAt,
-
-   
   });
 
+  /// Convert to Firestore Map
   Map<String, dynamic> toMap() {
     return {
-      'id': id,
+      'hotelId': hotelId,
+      'userId': userId,
       'name': name,
       'email': email,
-      'price': price,
-      'phonenumber': phonenumber,
-      'image': image,
+      'password': password,
       'location': location,
-      'available': available,
-      'guest': guest,    
-      'review': review,
-      'rating': rating,
+      'image': image,
+      'price': price,
+      'phonenumber': userPhoneNumber,
+
+      'description': description,
+      'available': availableRoom,
+      'guest': guest,
+      'rooms':roomscount,
+
+      'roomType': roomType,
+      'floor': floor,
+      'roomNumber': roomNumber,
       'discount': discount,
-      'checkin': checkInDate,
-      'checkout': checkOutDate,
+
+      // 'review': review,
+      // 'rating': rating,
+
+      'checkInDate': checkInDate,
+      'checkOutDate': checkOutDate,
+
       'createdAt': FieldValue.serverTimestamp(),
     };
   }
 
+  /// Convert document to model
   factory HotelAppModel.fromMap(Map<String, dynamic> map, String docId) {
     return HotelAppModel(
-      id: docId,
-      name: map['name'] ?? '',
-      email: map['email'] ?? '',
-      password: '',
-      price: (map['price'] ?? 0).toDouble(),
-      phonenumber: map['phonenumber'],
-      location: map['location'] ?? '',
-      available: map['available'] ?? '',
-      image: map['image'] ?? '',
-      guest: map['guest'],     
-      review: map['review'],
-      rating: (map['rating'] ?? 0).toDouble(),
-      discount: map['discount'],
-      checkInDate: (map['checkin'] as Timestamp?)?.toDate(),
-      checkOutDate: (map['checkout'] as Timestamp?)?.toDate(),
-      createdAt: (map['createdAt'] as Timestamp?)?.toDate(),
+      hotelId: map['hotelId'] ?? docId,
+      userId: map['userId'] ?? "",
+      name: map['name'] ?? "",
+      email: map['email'] ?? "",
+      password: "", // never store password
 
-     
+      location: map['location'],
+      image: map['image'],
+      price: (map['price'] ?? 0).toDouble(),
+
+      userPhoneNumber: map['phonenumber'],
+      description: map['description'],
+      availableRoom: map['available'],
+
+      guest: map['guest'],
+      // review: map['review'],
+      // rating: (map['rating'] ?? 0).toDouble(),
+      roomscount: map['rooms'],
+
+      roomType: map['roomType'],
+      floor: map['floor'],
+      roomNumber: map['roomNumber'],
+      discount: map['discount']??'',
+
+      checkInDate: (map['checkInDate'] as Timestamp?)?.toDate(),
+      checkOutDate: (map['checkOutDate'] as Timestamp?)?.toDate(),
+      createdAt: (map['createdAt'] as Timestamp?)?.toDate(),
     );
   }
 }

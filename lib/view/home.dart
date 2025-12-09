@@ -1,6 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hotelbookingapp/view/hoteldetails.dart';
+import 'package:hotelbookingapp/view/profile.dart';
+import 'package:hotelbookingapp/view/selectuserdate.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -10,6 +13,67 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  List<String> favoriteHotels = [];
+   // Add this
+    @override
+  void initState() {
+    super.initState();
+    loadFavorites();
+  }
+
+  // Load favorite hotel IDs from Firestore
+  void loadFavorites() async {
+    String uid = FirebaseAuth.instance.currentUser!.uid;
+    var snapshot = await FirebaseFirestore.instance
+        .collection("users")
+        .doc(uid)
+        .collection("favorites")
+        .get();
+
+    setState(() {
+      favoriteHotels = snapshot.docs.map((doc) => doc.id).toList();
+    });
+  }
+
+  // Toggle favorite
+  void toggleFavorite(String hotelId, Map<String, dynamic> data) async {
+    String uid = FirebaseAuth.instance.currentUser!.uid;
+    final docRef = FirebaseFirestore.instance
+        .collection("users")
+        .doc(uid)
+        .collection("favorites")
+        .doc(hotelId);
+
+    if (favoriteHotels.contains(hotelId)) {
+      await docRef.delete();
+      setState(() {
+        favoriteHotels.remove(hotelId);
+      });
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text("Removed from favorites")));
+    } else {
+      await docRef.set(data);
+      setState(() {
+        favoriteHotels.add(hotelId);
+      });
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text("Added to favorites")));
+    }
+  }
+  addToFavorite(String hotelId, Map<String, dynamic> data) async {
+  String uid = FirebaseAuth.instance.currentUser!.uid;
+
+  FirebaseFirestore.instance
+      .collection("users")
+      .doc(uid)
+      .collection("favorites")
+      .doc(hotelId)
+      .set(data);
+
+   ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Added to favorites")),
+    );
+  } 
   TextEditingController searchController = TextEditingController();
 
   String searchQuery = "";
@@ -23,10 +87,17 @@ class _HomeState extends State<Home> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.amber,
-        iconTheme: const IconThemeData(color: Colors.black),
-        leading: const CircleAvatar(
-          backgroundColor: Colors.black,
-          child: Icon(Icons.person, color: Colors.white),
+        iconTheme:  IconThemeData(color: Colors.black),
+        leading:  Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: GestureDetector(onTap: () {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => Profile(),));
+          },
+            child: CircleAvatar(
+              backgroundColor: Colors.black,
+              child: Icon(Icons.person, color: Colors.white),
+            ),
+          ),
         ),
         actions: [
           IconButton(
@@ -77,7 +148,7 @@ class _HomeState extends State<Home> {
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: IconButton(
-                    onPressed: () => openFilterSheet(),
+                    onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (context) => HotelSearchScreen(),));} ,
                     icon: const Icon(Icons.filter_list, color: Colors.white),
                   ),
                 ),
@@ -153,218 +224,119 @@ class _HomeState extends State<Home> {
                     itemBuilder: (context, index) {
                       var hotel = filteredHotels[index];
 
-                      return Card(
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            GestureDetector(onTap: () {
-                              Navigator.push(context, MaterialPageRoute(builder: (context) =>Hoteldetails(hotelData: hotel) ));
-                            },
-                              child: ClipRRect(
-                                borderRadius: const BorderRadius.only(
-                                    topLeft: Radius.circular(10),
-                                    topRight: Radius.circular(10)),
-                                child: Image.network(
-                                  hotel["image"],
-                                  height: 120,
-                                  width: double.infinity,
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ),
+                     return Card(
+  shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(10)),
+  child: Stack(
+    children: [
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                           Hoteldetails(
+        hotelId: hotel.id,
+        hotel: hotel.data() as Map<String, dynamic>,
+      ),));
+            },
+            child: ClipRRect(
+              borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(10),
+                  topRight: Radius.circular(10)),
+              child: Image.network(
+                hotel["image"],
+                height: 120,
+                width: double.infinity,
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
 
-                            const SizedBox(height: 8),
+          SizedBox(height: 8),
 
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 8),
-                              child: Text(
-                                hotel["name"],
-                                style: const TextStyle(
-                                    fontSize: 16, fontWeight: FontWeight.bold),
-                              ),
-                            ),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 8),
+            child: Text(hotel["name"],
+                style: TextStyle(
+                    fontSize: 16, fontWeight: FontWeight.bold)),
+          ),
 
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 8),
-                              child: Text(
-                                hotel["location"],
-                                style: const TextStyle(color: Colors.grey),
-                              ),
-                            ),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 8),
+            child: Text(hotel["location"],
+                style: TextStyle(color: Colors.grey)),
+          ),
 
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 8),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
-                                    children: [
-                                      const Icon(Icons.star,
-                                          color: Colors.amber, size: 16),
-                                      const SizedBox(width: 4),
-                                      // Text(
-                                      //   hotel["rating"].toString(),
-                                      //   style: const TextStyle(
-                                      //       fontWeight: FontWeight.bold),
-                                      // ),
-                                    ],
-                                  ),
-                                  if (hotel['discount'] != null &&
-                                      hotel['discount'] != 0)
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 6, vertical: 2),
-                                      decoration: BoxDecoration(
-                                        color: Colors.red,
-                                        borderRadius: BorderRadius.circular(6),
-                                      ),
-                                      child: Text(
-                                        "${hotel['discount']}% OFF",
-                                        style: const TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.star,
+                        color: Colors.amber, size: 16),
+                    SizedBox(width: 4),
+                  ],
+                ),
+
+                if (hotel['discount'] != null &&
+                    hotel['discount'] != 0)
+                  Container(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text("${hotel['discount']}% OFF",
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold)),
+                  ),
+              ],
+            ),
+          ),
+        ],
+      ),
+
+   Positioned(
+  right: 8,
+  top: 8,
+  child: IconButton(
+    icon: Icon(
+      favoriteHotels.contains(hotel.id) 
+          ? Icons.favorite    // Filled heart if favorite
+          : Icons.favorite_border, // Outline heart if not favorite
+      color: favoriteHotels.contains(hotel.id) 
+          ? Colors.red      // Red color if favorite
+          : Colors.grey,    // Grey color if not favorite
+    ),
+    onPressed: () {
+      toggleFavorite(hotel.id, hotel.data() as Map<String, dynamic>);
+    },
+  ),
+),
+
+
+    ],
+  ),
+);
+
                     },
                   );
                 },
               ),
             ),
+            
           ],
         ),
       ),
     );
   }
 
-  // 🔥 FILTER BOTTOMSHEET
-  void openFilterSheet() {
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius:
-            BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (_) {
-        return StatefulBuilder(
-          builder: (context, setStateSheet) {
-            return Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // HEADER
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      TextButton(
-                          onPressed: () => Navigator.pop(context),
-                          child: const Text("Cancel")),
-                      const Text("Filter",
-                          style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold)),
-                      TextButton(
-                        onPressed: () {
-                          setState(() {
-                            selectedRating = 0;
-                            minPrice = 0;
-                            maxPrice = 500;
-                            selectedLocation = "";
-                          });
-                          Navigator.pop(context);
-                        },
-                        child: const Text("Reset"),
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 10),
-                  const Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text("Ratings")),
-
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: List.generate(5, (i) {
-                      int rating = i + 1;
-                      return GestureDetector(
-                        onTap: () {
-                          setStateSheet(() => selectedRating = rating);
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: selectedRating == rating
-                                ? Colors.blue
-                                : Colors.white,
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: Colors.grey),
-                          ),
-                          child: Row(
-                            children: [
-                              Text("$rating",
-                                  style: TextStyle(
-                                      color: selectedRating == rating
-                                          ? Colors.white
-                                          : Colors.black)),
-                              const Icon(Icons.star,
-                                  size: 16, color: Colors.amber),
-                            ],
-                          ),
-                        ),
-                      );
-                    }),
-                  ),
-
-                  const SizedBox(height: 20),
-                  // const Align(
-                  //     alignment: Alignment.centerLeft,
-                  //     child: Text("Price Range")),
-
-                  RangeSlider(
-                    values: RangeValues(minPrice, maxPrice),
-                    min: 0,
-                    max: 1000,
-                    divisions: 20,
-                    labels: RangeLabels(
-                        "\$${minPrice.toInt()}",
-                        "\$${maxPrice.toInt()}"),
-                    onChanged: (value) {
-                      setStateSheet(() {
-                        minPrice = value.start;
-                        maxPrice = value.end;
-                      });
-                    },
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                        minimumSize: const Size(double.infinity, 50),
-                        backgroundColor: Colors.blue),
-                    onPressed: () {
-                      setState(() {}); // update UI
-                      Navigator.pop(context);
-                    },
-                    child: const Text("APPLY",
-                        style: TextStyle(color: Colors.white)),
-                  )
-                ],
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
 }

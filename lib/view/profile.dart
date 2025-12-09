@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hotelbookingapp/view/Favourit.dart';
-import 'package:hotelbookingapp/view/bookinghistory.dart';
-import 'package:hotelbookingapp/view/payment.dart';
+import 'package:hotelbookingapp/view/paymenthistory.dart';
 import 'package:hotelbookingapp/view/settings.dart';
 
 class Profile extends StatelessWidget {
@@ -76,7 +75,7 @@ class Profile extends StatelessWidget {
                       leading: const Icon(Icons.history),
                       title: const Text("History"),
                       trailing: GestureDetector(onTap: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => Bookinghistory(),));
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => Paymenthistory(),));
                       },child: const Icon(Icons.arrow_forward_ios)),
                     
                     ),
@@ -105,17 +104,8 @@ class Profile extends StatelessWidget {
                       trailing: const Icon(Icons.arrow_forward_ios),
                      
                     ),
-                  ),
-                  const SizedBox(height: 20),
-
-                 ListTile(
-                      tileColor: Colors.white,
-                      leading: const Icon(Icons.payment),
-                      title: const Text("Payment"),
-                      trailing: const Icon(Icons.arrow_forward_ios),
-                      onTap: () {Navigator.push(context, MaterialPageRoute(builder: (context) => Payment(),));},
-                    ),
-                  
+                  ),                
+                
                 ],
               ),
             ),

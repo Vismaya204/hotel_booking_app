@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hotelbookingapp/view/alluserscreen.dart';
+import 'package:hotelbookingapp/view/register_login.dart';
 import 'package:lottie/lottie.dart';
 
 class Splash extends StatefulWidget {
@@ -12,12 +12,23 @@ class Splash extends StatefulWidget {
 class _SplashState extends State<Splash> {
   @override
   Widget build(BuildContext context) {
-    Future.delayed(Duration(seconds: 2), () {
+    Future.delayed(Duration(seconds: 5), () {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => Alluserscreen()),
+        MaterialPageRoute(builder: (context) => RegisterLogin()),
       );
     });
-    return Scaffold(backgroundColor: Colors.amber,body: Center(child: Lottie.asset("assets/"),),);
+    return Scaffold(
+      backgroundColor: Colors.amber,
+      body: Column(mainAxisAlignment: MainAxisAlignment.center,
+        children: [Center(child: Text("HOTEL",style: TextStyle(fontSize: 30,fontWeight: FontWeight.bold),)),
+          SizedBox(
+            height: 200,
+            width: 200,
+            child: Center(child: Lottie.asset("assets/Hotel Booking.json")),
+          ),
+        ],
+      ),
+    );
   }
 }
