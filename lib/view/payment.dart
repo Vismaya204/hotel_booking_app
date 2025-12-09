@@ -39,6 +39,7 @@ class _PaymentState extends State<Payment> {
   final TextEditingController cardNumberCtrl = TextEditingController();
   final TextEditingController expiryCtrl     = TextEditingController();
   final TextEditingController cvvCtrl        = TextEditingController();
+bool _isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -138,64 +139,65 @@ class _PaymentState extends State<Payment> {
 
             const SizedBox(height: 30),
 
-            SizedBox(
-              width: double.infinity,
-              height: 55,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  foregroundColor: Colors.white,
-                ),
-               onPressed: () async {
+           SizedBox(
+  width: double.infinity,
+  height: 55,
+  child: ElevatedButton(
+    style: ElevatedButton.styleFrom(
+      backgroundColor: Colors.blue,
+      foregroundColor: Colors.white,
+    ),
+    onPressed: _isLoading ? null : () async {
+      if (cardHolderCtrl.text.isEmpty ||
+          cardNumberCtrl.text.isEmpty ||
+          expiryCtrl.text.isEmpty ||
+          cvvCtrl.text.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Fill all fields")),
+        );
+        return;
+      }
 
-  if (cardHolderCtrl.text.isEmpty ||
-      cardNumberCtrl.text.isEmpty ||
-      expiryCtrl.text.isEmpty ||
-      cvvCtrl.text.isEmpty) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Fill all fields")),
-    );
-    return;
-  } // Get current user object
-  final user = FirebaseAuth.instance.currentUser;
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) return;
 
-  if (user == null) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("No user logged in")),
-    );
-    return;
-  }
+      setState(() => _isLoading = true);
 
+      try {
+        final uid = FirebaseAuth.instance.currentUser!.uid;
 
-  final uid = FirebaseAuth.instance.currentUser!.uid;
+        await FirebaseFirestore.instance
+            .collection("payments")
+            .doc(uid)
+            .collection("history")
+            .add({
+          "hotelName": widget.hotelName,
+          "hotelImage": widget.hotelImage,
+          "price": widget.price,
+          "paymentMethod": selectedPay.value,
+          "useremail": user.email,
+          "date": FieldValue.serverTimestamp(),
+        });
 
-await FirebaseFirestore.instance
-    .collection("payments")
-    .doc(uid)
-    .collection("history")
-    .add({
-  "hotelName": widget.hotelName,
-  "hotelImage": widget.hotelImage,
-  "price": widget.price,
-  "paymentMethod": selectedPay.value,
-  "useremail":user.email,
-  "date": FieldValue.serverTimestamp(),
-   // IMPORTANT
-});
+        setState(() => _isLoading = false);
 
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const Success()),
+        );
+      } catch (e) {
+        setState(()=> _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Error: $e")),
+        );
+      }
+    },
+    child: _isLoading
+        ? const CircularProgressIndicator(color: Colors.white)
+        : const Text("PAY NOW", style: TextStyle(fontSize: 18)),
+  ),
+)
 
-  Navigator.push(
-    context,
-    MaterialPageRoute(builder: (context) => const Success()),
-  );
-}
-
-                ,child: const Text(
-                  "PAY NOW",
-                  style: TextStyle(fontSize: 18),
-                ),
-              ),
-            )
           ],
         ),
       ),

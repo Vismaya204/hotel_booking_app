@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hotelbookingapp/view/addroomdateils.dart';
 import 'package:hotelbookingapp/view/admin.dart';
-import 'package:hotelbookingapp/view/home.dart';
+import 'package:hotelbookingapp/view/alluserscreen.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -361,7 +361,7 @@ Future<void> userRoombook({
         ).showSnackBar(const SnackBar(content: Text("User login successful")));
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => Home()),
+          MaterialPageRoute(builder: (context) => Alluserscreen()),
         );
       } else if (hotelDoc.exists) {
         // ✅ Hotel login with admin approval check

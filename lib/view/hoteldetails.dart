@@ -207,13 +207,14 @@ class _HoteldetailsState extends State<Hoteldetails> {
                 ),
               ),
             SizedBox(height: 10),
-            Align(
-              alignment: Alignment.topLeft,
-              child: Text(
-                "Description",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-            ),
+             Padding(
+               padding: const EdgeInsets.symmetric(horizontal: 12),
+               child: Text(
+                  "Description",
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+             ),
+            
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               child: Text(
@@ -223,32 +224,31 @@ class _HoteldetailsState extends State<Hoteldetails> {
             ),
 
             Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: SizedBox(
-                height: 50,
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      foregroundColor: Colors.white,
+                      minimumSize: Size(double.infinity, 45),
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              Reviewandratinguser(hotelId: widget.hotelId),
+              
+                        ),
+                      );
+                    },
+                    child: Text(
+                      " Add Reviews & Ratings",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
                   ),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) =>
-                            Reviewandratinguser(hotelId: widget.hotelId),
-
-                      ),
-                    );
-                  },
-                  child: Text(
-                    " Add Reviews & Ratings",
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ),
             ),
+              
+            
             SizedBox(height: 10,),
              Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -261,7 +261,7 @@ class _HoteldetailsState extends State<Hoteldetails> {
                 onPressed: () async {
   if (selectedRoomPrice == null) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Please select room")),
+      SnackBar(content: Text("Please select room",style: TextStyle(fontWeight: FontWeight.bold),)),
     );
     return;
   }

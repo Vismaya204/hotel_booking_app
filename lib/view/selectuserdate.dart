@@ -15,11 +15,12 @@ DateTime? checkOutDate;
 
 final TextEditingController checkInController = TextEditingController();
 final TextEditingController checkOutController = TextEditingController();
-final TextEditingController location=TextEditingController();
+ TextEditingController searchController = TextEditingController();
 
   int guests = 1;
   int rooms = 1;
-
+  String searchQuery = "";
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -77,14 +78,16 @@ final TextEditingController location=TextEditingController();
                     // Location Field
                     const Text("Where?"),
                     const SizedBox(height: 5),
-                    TextField(controller: location,
+                    TextField(controller:searchController ,
                       decoration: InputDecoration(
                         hintText: "Location",
                         prefixIcon: const Icon(Icons.location_on_outlined),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
-                      ),
+                      ), onChanged: (value) {
+                      setState(() => searchQuery = value.toLowerCase());
+                    },
                     ),
 
                     const SizedBox(height: 15),
@@ -254,7 +257,7 @@ final TextEditingController location=TextEditingController();
                       child: ElevatedButton(
                         onPressed: () { 
 
-                          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) =>Home() ,));
+                          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) =>Home( location: searchController.text.trim(), ) ,));
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.blue,
