@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -22,41 +21,35 @@ class _AdminDashboardState extends State<AdminDashboard> {
   }
 
   loadCounts() async {
-    var pending = await FirebaseFirestore.instance
-        .collection("hotels")
-        .where("status", isEqualTo: "pending")
-        .get();
+  var pending = await FirebaseFirestore.instance
+      .collection("hotels")
+      .where("status", isEqualTo: "pending")
+      .get();
 
-    var approved = await FirebaseFirestore.instance
-        .collection("hotels")
-        .where("status", isEqualTo: "approved")
-        .get();
+  var approved = await FirebaseFirestore.instance
+      .collection("hotels")
+      .where("status", isEqualTo: "approved")
+      .get();
 
-    var rejected = await FirebaseFirestore.instance
-        .collection("hotels")
-        .where("status", isEqualTo: "rejected")
-        .get();
+  var rejected = await FirebaseFirestore.instance
+      .collection("hotels")
+      .where("status", isEqualTo: "rejected")
+      .get();
 
-     int totalBookings = 0;
+  var bookingCountSnap = await FirebaseFirestore.instance
+      .collectionGroup("history")
+      .count()
+      .get();
 
-  var users = await FirebaseFirestore.instance.collection("payments").get();
+  setState(() {
+    pendingCount = pending.size;
+    approvedCount = approved.size;
+    rejectedCount = rejected.size;
+    bookingCount = bookingCountSnap.count ?? 0;
 
-  for (var u in users.docs) {
-    var hist = await FirebaseFirestore.instance
-        .collection("payments")
-        .doc(u.id)
-        .collection("history")
-        .get();
+  });
+}
 
-    totalBookings += hist.size;
-  }
-    setState(() {
-      pendingCount = pending.size;
-      approvedCount = approved.size;
-      rejectedCount = rejected.size;
-      bookingCount = totalBookings;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -143,7 +136,7 @@ class PendingHotels extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Pending Hotels")),
+      appBar: AppBar(backgroundColor: Colors.amber,title: const Text("Pending Hotels")),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
             .collection("hotels")
@@ -182,7 +175,7 @@ class ApprovedHotels extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Approved Hotels")),
+      appBar: AppBar(backgroundColor: Colors.amber,title: const Text("Approved Hotels")),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
             .collection("hotels")
@@ -259,102 +252,114 @@ class AllBookingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final uid = FirebaseAuth.instance.currentUser!.uid;
     return Scaffold(
-      appBar: AppBar(title: const Text("All Bookings")),
+      appBar: AppBar(backgroundColor: Colors.amber,title: const Text("All Bookings")),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
-            .collection("payments")
-            .doc(uid)
-            .collection("history").where("status", isEqualTo: "booking")
-            .orderBy(
-              "date",
-              descending: true,
-            ) // make sure this is the right collection
+            .collectionGroup("history")
             .snapshots(),
-      builder: (context, snap) {
-            if (snap.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            }
+        builder: (context, snap) {
+          if (snap.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-            if (!snap.hasData || snap.data!.docs.isEmpty) {
-              return const Center(
-                child: Text(
-                  "No Payment Found",
-                  style: TextStyle(fontSize: 18, color: Colors.grey),
-                ),
-              );
-            }
-final docs = snap.data!.docs;
+          if (!snap.hasData || snap.data!.docs.isEmpty) {
+            return const Center(
+              child: Text(
+                "No Payment Found",
+                style: TextStyle(fontSize: 18, color: Colors.grey),
+              ),
+            );
+          }
+
+          final docs = snap.data!.docs;
+
           return ListView.builder(
             itemCount: docs.length,
             itemBuilder: (context, index) {
-              final doc = docs[index];
-                final data = doc.data() as Map<String, dynamic>;
+              final data = docs[index].data() as Map<String, dynamic>;
 
               return Card(
-                  margin: const EdgeInsets.all(10),
-                  child: Column(
-                    children: [
-                      ListTile(
-                        leading: data["hotelImage"] != null
-                            ? Image.network(
-                                data["hotelImage"],
-                                width: 60,
-                                fit: BoxFit.cover,
-                              )
-                            : const Icon(Icons.hotel, size: 40),
+  margin: const EdgeInsets.all(10),
+  child: Padding(
+    padding: const EdgeInsets.all(12),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        
+        /// 🔵 Hotel Name
+        Text(
+          data["hotelName"] ?? "Hotel",
+          style: const TextStyle(
+            fontSize: 18, 
+            fontWeight: FontWeight.bold
+          ),
+        ),
+        const SizedBox(height: 5),
 
-                        title: Text(data["hotelName"] ?? "No hotel"),
+        /// 🏙 Location
+        if (data["location"] != null)
+          Text("📍 ${data["location"]}"),
 
-                        subtitle: Column(
-                          children: [Text(data["useremail"]??"No user email"),
-                            Text(
-                              "Paid: ₹${data["price"] ?? 0}\nMethod: ${data["paymentMethod"] ?? ""}",
-                            ),
-                          ],
-                        ),
+        const SizedBox(height: 5),
 
-                        trailing: Text(
-                          data["date"] == null ? "" : formatDate(data["date"]),
-                          style: const TextStyle(fontSize: 12),
-                        ),
-                      ),
-                       Align(
-                        alignment: Alignment.centerRight,
-                        child: TextButton(
-                          style: TextButton.styleFrom(
-                            foregroundColor: Colors.red,
-                          ),
-                          onPressed: () async {
-                            await FirebaseFirestore.instance
-                                .collection("payments")
-                                .doc(uid)
-                                .collection("history")
-                                .doc(doc.id)
-                                .delete();
+        /// 🖼 Hotel Image
+        if (data["hotelImage"] != null)
+          ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: Image.network(
+              data["hotelImage"],
+              height: 120,
+              width: double.infinity,
+              fit: BoxFit.cover,
+            ),
+          ),
 
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text("Payment canceled")),
-                            );
-                          },
-                          child: const Text("Cancel"),
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              
+        const SizedBox(height: 10),
+
+        /// 💼 Room
+        if (data["room"] != null)
+          Text("Room: ${data["room"]}"),
+
+        /// 🔥 Price
+        Text("Paid: ₹${data["price"]}"),
+        
+        /// 🟡 Dates
+        if (data["checkIn"] != null)
+          Text("Check-in: ${data["checkIn"]}"),
+
+        if (data["checkOut"] != null)
+          Text("Check-out: ${data["checkOut"]}"),
+
+        /// 👤 User
+        Text("User: ${data["useremail"]}"),
+
+        const SizedBox(height: 8),
+
+        /// 🔴 Cancel Button
+        Align(
+          alignment: Alignment.centerRight,
+          child: TextButton(
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            onPressed: () async {
+              await docs[index].reference.delete();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("Booking removed")),
+              );
+            },
+            child: const Text("Cancel Booking"),
+          ),
+        )
+      ],
+    ),
+  ),
+);
+
+
             },
           );
         },
       ),
-    ); 
-    
+    );
   }
-  String formatDate(Timestamp t) {
-    final d = t.toDate();
-    return "${d.day}/${d.month}/${d.year}";
-  }
-  }
-
+}

@@ -87,7 +87,15 @@ class Success extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                ),
+                ),const Text(
+  "Note: Payment is non-refundable.",
+  style: TextStyle(
+    fontSize: 12,
+    color: Colors.red,
+    fontWeight: FontWeight.w600,
+  ),
+),
+
 
               ],
             ),
