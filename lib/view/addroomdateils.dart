@@ -14,8 +14,6 @@ class AddRoomScreen extends StatefulWidget {
 
 class _AddRoomScreenState extends State<AddRoomScreen> {
   final TextEditingController roomType = TextEditingController();
-  final TextEditingController roomno = TextEditingController();
-  final TextEditingController floor = TextEditingController();
   final TextEditingController price = TextEditingController();
   final TextEditingController available = TextEditingController();
 
@@ -44,29 +42,13 @@ class _AddRoomScreenState extends State<AddRoomScreen> {
                 border: OutlineInputBorder(),
               ),
             ),
+            
+
+            
             const SizedBox(height: 12),
 
-            // 🔹 ROOM NUMBER
-            TextField(style: TextStyle(color: Colors.white),
-              controller: roomno,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                hintText: "Room Number",hintStyle: TextStyle(color: Colors.white),
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 12),
-
-            // 🔹 FLOOR
-            TextField(style: TextStyle(color: Colors.white),
-              controller: floor,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                hintText: "Floor",hintStyle: TextStyle(color: Colors.white),
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 12),
+          
+            
 
             // 🔹 PRICE
             TextField(style: TextStyle(color: Colors.white),
@@ -119,9 +101,7 @@ class _AddRoomScreenState extends State<AddRoomScreen> {
                       final controller = Provider.of<HotelBookingController>(context, listen: false);
                 
                       // 🛑 Input validation
-                      if (roomType.text.isEmpty ||
-                          roomno.text.isEmpty ||
-                          floor.text.isEmpty ||
+                      if (roomType.text.isEmpty ||                         
                           price.text.isEmpty ||                        
                           available.text.isEmpty) {
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -145,9 +125,7 @@ class _AddRoomScreenState extends State<AddRoomScreen> {
                         email: "",
                         password: "",
                 
-                        roomType: roomType.text,
-                        roomNumber: int.tryParse(roomno.text),
-                        floor: int.tryParse(floor.text),
+                        roomType: roomType.text,                      
                         price: double.tryParse(price.text),
                         availableRoom: available.text,
                        
@@ -160,9 +138,7 @@ class _AddRoomScreenState extends State<AddRoomScreen> {
                       );
                 
                       // 🔥 Clear fields
-                      roomType.clear();
-                      roomno.clear();
-                      floor.clear();
+                      roomType.clear();                 
                       price.clear();
                       available.clear();
                      

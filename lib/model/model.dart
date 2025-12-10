@@ -22,9 +22,7 @@ class HotelAppModel {
   // final double? rating;
 
   final String? roomType;
-  final int? floor;
-   final int? roomNumber;
-  final int? roomscount;
+   final int? roomscount;
   final String? discount;
 
   final DateTime? createdAt;
@@ -46,8 +44,6 @@ class HotelAppModel {
     // this.review,
     // this.rating,
     this.roomType,
-    this.floor,
-    this.roomNumber,
     this.discount,
     this.checkInDate,
     this.checkOutDate,
@@ -71,10 +67,7 @@ class HotelAppModel {
       'available': availableRoom,
       'guest': guest,
       'rooms':roomscount,
-
-      'roomType': roomType,
-      'floor': floor,
-      'roomNumber': roomNumber,
+      'roomType': roomType,     
       'discount': discount,
 
       // 'review': review,
@@ -110,8 +103,6 @@ class HotelAppModel {
       roomscount: map['rooms'],
 
       roomType: map['roomType'],
-      floor: map['floor'],
-      roomNumber: map['roomNumber'],
       discount: map['discount']??'',
 
       checkInDate: (map['checkInDate'] as Timestamp?)?.toDate(),

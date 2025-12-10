@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:hotelbookingapp/view/bookinguserpage.dart';
 
 class AdminDashboard extends StatefulWidget {
   const AdminDashboard({super.key});
@@ -279,81 +280,102 @@ class AllBookingsScreen extends StatelessWidget {
             itemBuilder: (context, index) {
               final data = docs[index].data() as Map<String, dynamic>;
 
-              return Card(
-  margin: const EdgeInsets.all(10),
-  child: Padding(
-    padding: const EdgeInsets.all(12),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        
-        /// 🔵 Hotel Name
-        Text(
-          data["hotelName"] ?? "Hotel",
-          style: const TextStyle(
-            fontSize: 18, 
-            fontWeight: FontWeight.bold
-          ),
-        ),
-        const SizedBox(height: 5),
+              return InkWell(onTap: () {
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (_) => BookingSummary(
+        hotelId: data["hotelId"] ?? "",
+hotelName: data["hotelName"] ?? "",
+hotelImage: data["hotelImage"] ?? "",
+price: (data["price"] ?? 0).toString(),
 
-        /// 🏙 Location
-        if (data["location"] != null)
-          Text("📍 ${data["location"]}"),
+        checkin: (data["checkIn"] as Timestamp?)?.toDate() ?? DateTime.now(),
+checkout: (data["checkOut"] as Timestamp?)?.toDate() ?? DateTime.now(),
 
-        const SizedBox(height: 5),
-
-        /// 🖼 Hotel Image
-        if (data["hotelImage"] != null)
-          ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: Image.network(
-              data["hotelImage"],
-              height: 120,
-              width: double.infinity,
-              fit: BoxFit.cover,
-            ),
-          ),
-
-        const SizedBox(height: 10),
-
-        /// 💼 Room
-        if (data["room"] != null)
-          Text("Room: ${data["room"]}"),
-
-        /// 🔥 Price
-        Text("Paid: ₹${data["price"]}"),
-        
-        /// 🟡 Dates
-        if (data["checkIn"] != null)
-          Text("Check-in: ${data["checkIn"]}"),
-
-        if (data["checkOut"] != null)
-          Text("Check-out: ${data["checkOut"]}"),
-
-        /// 👤 User
-        Text("User: ${data["useremail"]}"),
-
-        const SizedBox(height: 8),
-
-        /// 🔴 Cancel Button
-        Align(
-          alignment: Alignment.centerRight,
-          child: TextButton(
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            onPressed: () async {
-              await docs[index].reference.delete();
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text("Booking removed")),
-              );
-            },
-            child: const Text("Cancel Booking"),
-          ),
-        )
-      ],
+        guests: data["guests"] ?? 1,
+        rooms: data["rooms"] ?? 1,
+      ),
     ),
-  ),
-);
+  );
+},
+
+                child: Card(
+                  margin: const EdgeInsets.all(10),
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        
+                        /// 🔵 Hotel Name
+                        Text(
+                          data["hotelName"] ?? "Hotel",
+                          style: const TextStyle(
+                            fontSize: 18, 
+                            fontWeight: FontWeight.bold
+                          ),
+                        ),
+                        const SizedBox(height: 5),
+                
+                        /// 🏙 Location
+                        if (data["location"] != null)
+                          Text("📍 ${data["location"]}"),
+                
+                        const SizedBox(height: 5),
+                
+                        /// 🖼 Hotel Image
+                        if (data["hotelImage"] != null)
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: Image.network(
+                data["hotelImage"],
+                height: 120,
+                width: double.infinity,
+                fit: BoxFit.cover,
+                            ),
+                          ),
+                
+                        const SizedBox(height: 10),
+                
+                        /// 💼 Room
+                        if (data["room"] != null)
+                          Text("Room: ${data["room"]}"),
+                
+                        /// 🔥 Price
+                        Text("Paid: ₹${data["price"]}"),
+                        
+                        /// 🟡 Dates
+                        if (data["checkIn"] != null)
+                          Text("Check-in: ${data["checkIn"]}"),
+                
+                        if (data["checkOut"] != null)
+                          Text("Check-out: ${data["checkOut"]}"),
+                
+                        /// 👤 User
+                        Text("User: ${data["useremail"]}"),
+                
+                        const SizedBox(height: 8),
+                
+                        /// 🔴 Cancel Button
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: TextButton(
+                            style: TextButton.styleFrom(foregroundColor: Colors.red),
+                            onPressed: () async {
+                await docs[index].reference.delete();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Booking removed")),
+                );
+                            },
+                            child: const Text("Cancel Booking"),
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+              );
 
 
             },

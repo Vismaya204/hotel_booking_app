@@ -157,11 +157,9 @@ class HotelBookingController extends ChangeNotifier {
 
     // Create room data
     final hoteladdroomData = {
-      "roomType": room.roomType ?? "",
-      "floor": room.floor ?? 0,
+      "roomType": room.roomType ?? "",  
       "price": room.price ?? 0,
       "available": room.availableRoom ?? "",
-      "roomNumber": room.roomNumber ?? 0,
       "images": imageUrls,
       "createdAt": FieldValue.serverTimestamp(),
     };
@@ -187,31 +185,6 @@ class HotelBookingController extends ChangeNotifier {
   }
 }
 
-Future<void> userRoombook({
-  required HotelAppModel userRoombooking,
-  required BuildContext context,
-}) async {
-  try {
-    String bookingId =
-        FirebaseFirestore.instance.collection("roomBookings").doc().id;
-
-    await FirebaseFirestore.instance
-        .collection("roomBookings")
-        .doc(bookingId)
-        .set({
-      ...userRoombooking.toMap(),
-      "bookingId": bookingId, // ensure booking ID saved
-    });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Room booked successfully!")),
-    );
-  } catch (e) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Booking failed: $e")),
-    );
-  }
-}
 
 
 
