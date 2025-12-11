@@ -37,16 +37,19 @@ class _LoginState extends State<Login> {
               ),
               SizedBox(height: 20),
               TextField(
-                style: TextStyle(color: Colors.white),
-                controller: email,
-                decoration: InputDecoration(
-                  hintText: "Email",
-                  hintStyle: TextStyle(color: Colors.white),
-                  enabledBorder: OutlineInputBorder(borderSide:BorderSide(color: Colors.amber) ,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-              ),
+  decoration: InputDecoration(
+    hintText: 'Email',hintStyle: TextStyle(color: Colors.white),
+    enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10),
+      borderSide: BorderSide(color: Colors.amber),
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderSide: BorderSide(color: Colors.yellow, ),
+    ),
+  
+  ),
+  style: TextStyle(color: Colors.white),
+   cursorColor: Colors.amber,
+),
               SizedBox(height: 10),
               TextField(
                 style: TextStyle(color: Colors.white),
@@ -56,8 +59,8 @@ class _LoginState extends State<Login> {
                   hintStyle: TextStyle(color: Colors.white),
                   enabledBorder: OutlineInputBorder(borderSide:BorderSide(color: Colors.amber) ,
                     borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
+                  ),focusedBorder: OutlineInputBorder(borderSide:BorderSide(color: Colors.amber))
+                ),cursorColor: Colors.amber,
               ),
               GestureDetector(
                 onTap: () {
@@ -70,7 +73,7 @@ class _LoginState extends State<Login> {
                   alignment: Alignment.bottomRight,
                   child: Text(
                     "Forgot Password?",
-                    style: TextStyle(color: Colors.amber),
+                    style: TextStyle(color: Colors.white),
                   ),
                 ),
               ),
