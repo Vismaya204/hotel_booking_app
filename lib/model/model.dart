@@ -7,22 +7,20 @@ class HotelAppModel {
   final String email;
   final String password;
 
-  final String? location;
-  final int? userPhoneNumber;
+   final String? location;
+  final String? userPhoneNumber;
   final double? price;
   final String? image;
   final String? description;
-  final String? availableRoom;
-
-  final int? guest;
-  final DateTime? checkInDate;
-  final DateTime? checkOutDate;
+ 
+  // final int? guest;
+  // final DateTime? checkInDate;
+  // final DateTime? checkOutDate;
 
   // final String? review;
   // final double? rating;
 
-  final String? roomType;
-   final int? roomscount;
+  
   final String? discount;
 
   final DateTime? createdAt;
@@ -38,15 +36,15 @@ class HotelAppModel {
     this.price,
     this.image,
     this.description,
-    this.availableRoom,
-    this.guest,
-    this.roomscount,
+   
+    // this.guest,
+   
     // this.review,
     // this.rating,
-    this.roomType,
+   
     this.discount,
-    this.checkInDate,
-    this.checkOutDate,
+    // this.checkInDate,
+    // this.checkOutDate,
     this.createdAt,
   });
 
@@ -64,17 +62,17 @@ class HotelAppModel {
       'phonenumber': userPhoneNumber,
 
       'description': description,
-      'available': availableRoom,
-      'guest': guest,
-      'rooms':roomscount,
-      'roomType': roomType,     
+      
+      // 'guest': guest,
+      
+         
       'discount': discount,
 
       // 'review': review,
       // 'rating': rating,
 
-      'checkInDate': checkInDate,
-      'checkOutDate': checkOutDate,
+      // 'checkInDate': checkInDate,
+      // 'checkOutDate': checkOutDate,
 
       'createdAt': FieldValue.serverTimestamp(),
     };
@@ -89,24 +87,24 @@ class HotelAppModel {
       email: map['email'] ?? "",
       password: "", // never store password
 
-      location: map['location'],
+      location: map['location']??"",
       image: map['image'],
       price: (map['price'] ?? 0).toDouble(),
 
-      userPhoneNumber: map['phonenumber'],
+      userPhoneNumber: map['phonenumber']??"",
       description: map['description'],
-      availableRoom: map['available'],
+    
 
-      guest: map['guest'],
+      // guest: map['guest'],
       // review: map['review'],
       // rating: (map['rating'] ?? 0).toDouble(),
-      roomscount: map['rooms'],
+     
 
-      roomType: map['roomType'],
+     
       discount: map['discount']??'',
 
-      checkInDate: (map['checkInDate'] as Timestamp?)?.toDate(),
-      checkOutDate: (map['checkOutDate'] as Timestamp?)?.toDate(),
+      // checkInDate: (map['checkInDate'] as Timestamp?)?.toDate(),
+      // checkOutDate: (map['checkOutDate'] as Timestamp?)?.toDate(),
       createdAt: (map['createdAt'] as Timestamp?)?.toDate(),
     );
   }

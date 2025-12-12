@@ -157,9 +157,9 @@ class HotelBookingController extends ChangeNotifier {
 
     // Create room data
     final hoteladdroomData = {
-      "roomType": room.roomType ?? "",  
+      
       "price": room.price ?? 0,
-      "available": room.availableRoom ?? "",
+     
       "images": imageUrls,
       "createdAt": FieldValue.serverTimestamp(),
     };
@@ -208,6 +208,8 @@ class HotelBookingController extends ChangeNotifier {
             'username': user.name,
             'email': user.email,
             "phonenumber": user.userPhoneNumber,
+            "location":user.location,
+            "profileimage":user.image,
             'createdAt': FieldValue.serverTimestamp(),
           });
 

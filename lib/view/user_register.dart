@@ -13,8 +13,10 @@ class UserRegister extends StatefulWidget {
 class _UserRegisterState extends State<UserRegister> {
   TextEditingController username=TextEditingController();
   TextEditingController email=TextEditingController();
-  TextEditingController Password=TextEditingController();
+  TextEditingController password=TextEditingController();
   TextEditingController phonenumber=TextEditingController();
+  TextEditingController location=TextEditingController();
+
  
   
   @override
@@ -44,7 +46,7 @@ class _UserRegisterState extends State<UserRegister> {
                 ),
               ),
             ),SizedBox(height: 10,),
-            TextField(style: TextStyle(color: Colors.white),controller: Password,
+            TextField(style: TextStyle(color: Colors.white),controller: password,
               decoration: InputDecoration(
                 hintText: "Password",hintStyle: TextStyle(color: Colors.white),
                 border: OutlineInputBorder(
@@ -59,7 +61,16 @@ class _UserRegisterState extends State<UserRegister> {
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
-            ),SizedBox(height: 20,),
+            ),SizedBox(height: 10,),
+            TextField(style: TextStyle(color: Colors.white)
+              ,controller: location,
+            decoration: InputDecoration(hintText: "Location",hintStyle: TextStyle(color: Colors.white),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+          ),
+            SizedBox(height: 20,),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: ElevatedButton(
@@ -71,8 +82,9 @@ class _UserRegisterState extends State<UserRegister> {
                   userId:"",
                   name: username.text,
                   email: email.text,
-                  password: Password.text,
-                  userPhoneNumber: int.tryParse(phonenumber.text),              
+                  password: password.text,
+                  userPhoneNumber: phonenumber.text, 
+                  location: location.text             
                 );Provider.of<HotelBookingController>(context,listen: false).usersignup(
                   user: usermodel,
                   context: context,

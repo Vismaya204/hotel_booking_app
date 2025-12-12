@@ -37,19 +37,21 @@ class _LoginState extends State<Login> {
               ),
               SizedBox(height: 20),
               TextField(
-  decoration: InputDecoration(
-    hintText: 'Email',hintStyle: TextStyle(color: Colors.white),
-    enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10),
-      borderSide: BorderSide(color: Colors.amber),
-    ),
-    focusedBorder: OutlineInputBorder(
-      borderSide: BorderSide(color: Colors.yellow, ),
-    ),
-  
-  ),
-  style: TextStyle(color: Colors.white),
-   cursorColor: Colors.amber,
-),
+                controller: email,
+                decoration: InputDecoration(
+                  hintText: 'Email',
+                  hintStyle: TextStyle(color: Colors.white),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: Colors.amber),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.yellow),
+                  ),
+                ),
+                style: TextStyle(color: Colors.white),
+                cursorColor: Colors.amber,
+              ),
               SizedBox(height: 10),
               TextField(
                 style: TextStyle(color: Colors.white),
@@ -57,10 +59,15 @@ class _LoginState extends State<Login> {
                 decoration: InputDecoration(
                   hintText: "Password",
                   hintStyle: TextStyle(color: Colors.white),
-                  enabledBorder: OutlineInputBorder(borderSide:BorderSide(color: Colors.amber) ,
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.amber),
                     borderRadius: BorderRadius.circular(10),
-                  ),focusedBorder: OutlineInputBorder(borderSide:BorderSide(color: Colors.amber))
-                ),cursorColor: Colors.amber,
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.amber),
+                  ),
+                ),
+                cursorColor: Colors.amber,
               ),
               GestureDetector(
                 onTap: () {

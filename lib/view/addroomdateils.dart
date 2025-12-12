@@ -32,23 +32,8 @@ class _AddRoomScreenState extends State<AddRoomScreen> {
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-
-            // 🔹 ROOM TYPE
-            TextField(style: TextStyle(color: Colors.white),
-              controller: roomType,
-              decoration: const InputDecoration(
-                hintText: "Room Type",hintStyle: TextStyle(color: Colors.white),
-                border: OutlineInputBorder(),
-              ),
-            ),
-            
-
-            
-            const SizedBox(height: 12),
-
-          
-            
+          children: [                       
+            const SizedBox(height: 12),    
 
             // 🔹 PRICE
             TextField(style: TextStyle(color: Colors.white),
@@ -59,16 +44,9 @@ class _AddRoomScreenState extends State<AddRoomScreen> {
                 border: OutlineInputBorder(),
               ),
             ),
-            const SizedBox(height: 12),
+           
 
-            // 🔹 AVAILABLE
-            TextField(style: TextStyle(color: Colors.white),
-              controller: available,
-              decoration: const InputDecoration(
-                hintText: "Available (Yes/No)",hintStyle: TextStyle(color: Colors.white),
-                border: OutlineInputBorder(),
-              ),
-            ),                   
+                 
             const SizedBox(height: 20),
 
             // 🔹 IMAGE PICKER
@@ -125,9 +103,8 @@ class _AddRoomScreenState extends State<AddRoomScreen> {
                         email: "",
                         password: "",
                 
-                        roomType: roomType.text,                      
+                                             
                         price: double.tryParse(price.text),
-                        availableRoom: available.text,
                        
                       );
                 
@@ -138,9 +115,9 @@ class _AddRoomScreenState extends State<AddRoomScreen> {
                       );
                 
                       // 🔥 Clear fields
-                      roomType.clear();                 
+                                     
                       price.clear();
-                      available.clear();
+                    
                      
                     },
                     child: const Text(
