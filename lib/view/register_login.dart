@@ -17,7 +17,9 @@ class RegisterLogin extends StatelessWidget {
             // 🔹 Register Button
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: SizedBox(height: 50,width: double.infinity,
+              child: SizedBox(
+                height: 50,
+                width: double.infinity,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.amber,
@@ -25,42 +27,68 @@ class RegisterLogin extends StatelessWidget {
                   ),
                   onPressed: () async {
                     final RenderBox overlay =
-                        Overlay.of(context).context.findRenderObject() as RenderBox;
-                
+                        Overlay.of(context).context.findRenderObject()
+                            as RenderBox;
+
                     final result = await showMenu<String>(
                       context: context,
                       position: RelativeRect.fromLTRB(
                         overlay.size.width / 2 - 100, // left
-                        overlay.size.height / 2 - 50,  // top
+                        overlay.size.height / 2 - 50, // top
                         overlay.size.width / 2 + 100, // right
                         overlay.size.height / 2 + 50, // bottom
                       ),
                       items: [
-                        const PopupMenuItem(
+                        PopupMenuItem(
                           value: 'user',
-                          child: Text("Register as User"),
+                          child: SizedBox(
+                            width: double.infinity,
+                            child: Text(
+                              "Register as User",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.amber,
+                              ),
+                            ),
+                          ),
                         ),
                         const PopupMenuItem(
                           value: 'hotel',
-                          child: Text("Register as Hotel"),
+                          child: SizedBox(
+                            width: double.infinity,
+                            child: Text(
+                              "Register as Hotel",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.amber,
+                              ),
+                            ),
+                          ),
                         ),
                       ],
-                      color: Colors.amber,
+                      color: Colors.black,
                     );
-                
+
                     if (result == 'user') {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const UserRegister(),),
+                        MaterialPageRoute(
+                          builder: (context) => const UserRegister(),
+                        ),
                       );
                     } else if (result == 'hotel') {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const HotelRegisterScreen()),
+                        MaterialPageRoute(
+                          builder: (context) => const HotelRegisterScreen(),
+                        ),
                       );
                     }
                   },
-                  child: const Text("Register",style: TextStyle(fontWeight: FontWeight.bold),),
+                  child: const Text(
+                    "Register",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
                 ),
               ),
             ),
@@ -70,7 +98,9 @@ class RegisterLogin extends StatelessWidget {
             // 🔹 Login Button
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: SizedBox(height: 50,width: double.infinity,
+              child: SizedBox(
+                height: 50,
+                width: double.infinity,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.amber,
@@ -82,7 +112,10 @@ class RegisterLogin extends StatelessWidget {
                       MaterialPageRoute(builder: (context) => const Login()),
                     );
                   },
-                  child: const Text("Login",style: TextStyle(fontWeight: FontWeight.bold),),
+                  child: const Text(
+                    "Login",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
                 ),
               ),
             ),

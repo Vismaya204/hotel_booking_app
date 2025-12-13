@@ -73,31 +73,34 @@ class _UserRegisterState extends State<UserRegister> {
             SizedBox(height: 20,),
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.amber,
-                  foregroundColor: Colors.black,
-                ),
-                onPressed: () {final usermodel=HotelAppModel(
-                  userId:"",
-                  name: username.text,
-                  email: email.text,
-                  password: password.text,
-                  userPhoneNumber: phonenumber.text, 
-                  location: location.text             
-                );Provider.of<HotelBookingController>(context,listen: false).usersignup(
-                  user: usermodel,
-                  context: context,
-                );
-                
-                
+              child: SizedBox(height: 50,width: double.infinity,
+                child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.amber,
+                      foregroundColor: Colors.black,
+                    ),
+                    onPressed: () {final usermodel=HotelAppModel(
+                      userId:"",
+                      name: username.text,
+                      email: email.text,
+                      password: password.text,
+                      userPhoneNumber: phonenumber.text, 
+                      location: location.text             
+                    );Provider.of<HotelBookingController>(context,listen: false).usersignup(
+                      user: usermodel,
+                      context: context,
+                    );
+                    
+                    
+                      
+                     
+                    },
                   
-                 
-                },
-              
-                child: Text("Sign Up"),
+                    child: Text("Sign Up"),
+                  ),
               ),
             ),
+            
           ],
         ),
       ),

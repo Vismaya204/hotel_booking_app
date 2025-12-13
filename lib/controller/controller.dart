@@ -209,7 +209,7 @@ class HotelBookingController extends ChangeNotifier {
             'email': user.email,
             "phonenumber": user.userPhoneNumber,
             "location":user.location,
-            "profileimage":user.image,
+           
             'createdAt': FieldValue.serverTimestamp(),
           });
 
