@@ -27,10 +27,12 @@ class _ForgotpasswordState extends State<Forgotpassword> {
             TextField(style: TextStyle(color: Colors.white),controller: email,
               decoration: InputDecoration(
                 hintText: "Email",hintStyle: TextStyle(color: Colors.white),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),borderSide: BorderSide(color: Colors.amber),
+                ),focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.amber),
                 ),
-              ),
+              ),cursorColor: Colors.amber,
             ),
            SizedBox(height: 20,),
            

@@ -50,10 +50,12 @@ class _HotelRegisterScreenState extends State<HotelRegisterScreen> {
                 decoration: InputDecoration(
                   hintText: "Hotel Name",
                   hintStyle: TextStyle(color: Colors.white),
-                  border: OutlineInputBorder(
+                  enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.amber),
                     borderRadius: BorderRadius.circular(10),
+                  ),focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.amber),
                   ),
-                ),
+                ),cursorColor: Colors.amber,
               ),
               SizedBox(height: 10),
               TextField(
@@ -62,10 +64,12 @@ class _HotelRegisterScreenState extends State<HotelRegisterScreen> {
                 decoration: InputDecoration(
                   hintText: "Location",
                   hintStyle: TextStyle(color: Colors.white),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),borderSide: BorderSide(color: Colors.amber),
+                  ),focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.amber),
                   ),
-                ),
+                ),cursorColor: Colors.amber,
               ),
               SizedBox(height: 10),
               TextField(
@@ -74,10 +78,14 @@ class _HotelRegisterScreenState extends State<HotelRegisterScreen> {
                 decoration: InputDecoration(
                   hintText: "Email",
                   hintStyle: TextStyle(color: Colors.white),
-                  border: OutlineInputBorder(
+                  enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: Colors.amber),
                   ),
-                ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.amber),
+                  ),
+                ),cursorColor: Colors.amber,
               ),
               SizedBox(height: 10),
               TextField(
@@ -87,26 +95,38 @@ class _HotelRegisterScreenState extends State<HotelRegisterScreen> {
                 decoration: InputDecoration(
                   hintText: "Password",
                   hintStyle: TextStyle(color: Colors.white),
-                  border: OutlineInputBorder(
+                  enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: Colors.amber),
                   ),
-                ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.amber),
+                  ),
+                ),cursorColor: Colors.amber,
               ),SizedBox(height: 10,),
               TextField(controller:description ,maxLines: 4,
                 style: TextStyle(color: Colors.white),
                 decoration: InputDecoration(hintText: "Descritipon",hintStyle: TextStyle(color: Colors.white),
-                  border: OutlineInputBorder(
+                  enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: Colors.amber),
                   ),
-                ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.amber),
+                  ),
+                ),cursorColor: Colors.amber,
               ),SizedBox(height: 10,),
                TextField(controller: discount,
                 style: TextStyle(color: Colors.white),
                 decoration: InputDecoration(hintText: "Discount",hintStyle: TextStyle(color: Colors.white),
-                  border: OutlineInputBorder(
+                  enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: Colors.amber),
                   ),
-                ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.amber),
+                  ),
+                ),cursorColor: Colors.amber,
               ),
               SizedBox(height: 20),
 
