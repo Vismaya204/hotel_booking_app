@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:hotelbookingapp/view/payment.dart';
 
 class BookingSummary extends StatelessWidget {
-    // const constructor
+  // const constructor
   final String hotelName;
   final String hotelImage;
   final String price;
@@ -11,7 +11,7 @@ class BookingSummary extends StatelessWidget {
   final DateTime checkout;
   final int guests;
   final int rooms;
-   final String hotelId;
+  final String hotelId;
 
   const BookingSummary({
     super.key,
@@ -22,7 +22,7 @@ class BookingSummary extends StatelessWidget {
     required this.checkout,
     required this.guests,
     required this.rooms,
-     required this.hotelId,
+    required this.hotelId,
   });
 
   @override
@@ -36,15 +36,18 @@ class BookingSummary extends StatelessWidget {
     final total = amount + tax;
 
     return Scaffold(
-      appBar: AppBar(backgroundColor: Colors.amber,
-        title: Text("Booking Summary",style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold),),
+      appBar: AppBar(
+        backgroundColor: Colors.amber,
+        title: Text(
+          "Booking Summary",
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(14),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            
             Row(
               children: [
                 ClipRRect(
@@ -60,12 +63,9 @@ class BookingSummary extends StatelessWidget {
                 Expanded(
                   child: Text(
                     hotelName,
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                   ),
-                )
+                ),
               ],
             ),
 
@@ -75,28 +75,26 @@ class BookingSummary extends StatelessWidget {
 
             SizedBox(height: 20),
 
-            Text("Booking Date: ${DateTime.now().day}-${DateTime.now().month}-${DateTime.now().year}"),
+            Text(
+              "Booking Date: ${DateTime.now().day}-${DateTime.now().month}-${DateTime.now().year}",
+            ),
             Text("Check-in: ${checkin.day}-${checkin.month}-${checkin.year}"),
-            Text("Check-out: ${checkout.day}-${checkout.month}-${checkout.year}"),
+            Text(
+              "Check-out: ${checkout.day}-${checkout.month}-${checkout.year}",
+            ),
             Text("Guests: $guests"),
             Text("Rooms: $rooms"),
 
-            Divider(height: 40,color: Colors.black,),
+            Divider(height: 40, color: Colors.black),
 
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text("Amount"),
-                Text("₹$price x $nights"),
-              ],
+              children: [Text("Amount"), Text("₹$price x $nights")],
             ),
 
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text("Tax (5%)"),
-                Text("₹$tax"),
-              ],
+              children: [Text("Tax (5%)"), Text("₹$tax")],
             ),
 
             Row(
@@ -109,35 +107,41 @@ class BookingSummary extends StatelessWidget {
 
             Spacer(),
 
-           Padding(
-             padding: const EdgeInsets.all(8.0),
-             child: SizedBox(height: 50,width: double.infinity,
-               child: ElevatedButton(style: ElevatedButton.styleFrom(foregroundColor: Colors.black,backgroundColor: Colors.blue),
-                 onPressed: () {
-                   Navigator.push(
-                     context,
-                     MaterialPageRoute(
-                       builder: (_) => Payment(
-                         hotelId: hotelId,
-                         hotelName: hotelName,
-                         hotelImage: hotelImage,
-                         price: int.parse(price),
-                         checkin: checkin,
-                         checkout: checkout,
-                         guests: guests,
-                         rooms: rooms,
-                         email: FirebaseAuth.instance.currentUser!.email,
-                         
-                       ),
-                     ),
-                   );
-                 },
-                 child: Text("CONTINUE TO PAYMENT",style: TextStyle(fontWeight: FontWeight.bold),),
-               ),
-             ),
-           )
-
-
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: SizedBox(
+                height: 50,
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.black,
+                    backgroundColor: Colors.blue,
+                  ),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => Payment(
+                          hotelId: hotelId,
+                          hotelName: hotelName,
+                          hotelImage: hotelImage,
+                          price: int.parse(price),
+                          checkin: checkin,
+                          checkout: checkout,
+                          guests: guests,
+                          rooms: rooms,
+                          email: FirebaseAuth.instance.currentUser!.email,
+                        ),
+                      ),
+                    );
+                  },
+                  child: Text(
+                    "CONTINUE TO PAYMENT",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),

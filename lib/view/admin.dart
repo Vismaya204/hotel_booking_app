@@ -1,8 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:hotelbookingapp/view/allbookingviewadmin.dart';
 import 'package:hotelbookingapp/view/bookinguserpage.dart';
 import 'package:hotelbookingapp/view/edithotelscreenadmin.dart';
-import 'package:hotelbookingapp/view/hoteldetails.dart';
+
 
 class AdminDashboard extends StatefulWidget {
   const AdminDashboard({super.key});
@@ -376,27 +378,15 @@ class AllBookingsScreen extends StatelessWidget {
 
               return InkWell(
                 onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => BookingSummary(
-                        hotelId: data["hotelId"] ?? "",
-                        hotelName: data["hotelName"] ?? "",
-                        hotelImage: data["hotelImage"] ?? "",
-                        price: (data["price"] ?? 0).toString(),
+                Navigator.push(
+  context,
+  MaterialPageRoute(
+    builder: (_) => Allbookingviewadmin(
+      userId: FirebaseAuth.instance.currentUser!.uid,
+    ),
+  ),
+);
 
-                        checkin:
-                            (data["checkIn"] as Timestamp?)?.toDate() ??
-                            DateTime.now(),
-                        checkout:
-                            (data["checkOut"] as Timestamp?)?.toDate() ??
-                            DateTime.now(),
-
-                        guests: data["guests"] ?? 1,
-                        rooms: data["rooms"] ?? 1,
-                      ),
-                    ),
-                  );
                 },
 
                 child: Card(
@@ -455,27 +445,11 @@ class AllBookingsScreen extends StatelessWidget {
                         const SizedBox(height: 8),
 
                         /// 🔴 Cancel Button
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: TextButton(
-                            style: TextButton.styleFrom(
-                              foregroundColor: Colors.red,
-                            ),
-                            onPressed: () async {
-                              await docs[index].reference.delete();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text("Booking removed"),
-                                ),
-                              );
-                            },
-                            child: const Text("Cancel Booking"),
-                          ),
-                        ),
+                      
                       ],
                     ),
                   ),
-                ),
+                )
               );
             },
           );
@@ -522,7 +496,7 @@ class AdminApprovedHotels extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => Hoteldetails(
+                      builder: (context) =>EditHotelFull(
                         hotelId: snapshot.data!.docs[index].id,
                         hotel: hotel,
                       ),

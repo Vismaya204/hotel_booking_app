@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:hotelbookingapp/view/bookinguserpage.dart';
 import 'package:hotelbookingapp/view/reviewandratinguser.dart';
+import 'package:hotelbookingapp/view/selectuserdate.dart';
 
 class Hoteldetails extends StatefulWidget {
     final String hotelId;
@@ -252,40 +252,41 @@ class _HoteldetailsState extends State<Hoteldetails> {
             SizedBox(height: 10,),
              Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.amber,
-                  foregroundColor: Colors.black,
-                  minimumSize: Size(double.infinity, 45),
-                ),
-                onPressed: () async {
-  if (selectedRoomPrice == null) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Please select room",style: TextStyle(fontWeight: FontWeight.bold),)),
-    );
-    return;
-  }
+              child:ElevatedButton(
+  style: ElevatedButton.styleFrom(
+    backgroundColor: Colors.amber,
+    foregroundColor: Colors.black,
+    minimumSize: Size(double.infinity, 45),
+  ),
+  onPressed: () {
+    if (selectedRoomPrice == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            "Please select room",
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+        ),
+      );
+      return;
+    }
 
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (_) => BookingSummary(
-        hotelName: hotel["name"],
-        hotelImage: selectedImage ?? hotel["image"],
-        price: selectedRoomPrice!,
-        checkin: DateTime.now(),
-        checkout: DateTime.now().add(Duration(days: 1)),
-        guests: 1,
-        rooms: 1,
-        hotelId: widget.hotelId,
+    // Navigate to HotelSearchScreen & pass selected room info
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => HotelSearchScreen(
+          hotelName: widget.hotel["name"],
+          hotelImage: selectedImage ?? widget.hotel["image"],
+          price: selectedRoomPrice!,
+          hotelId: widget.hotelId,
+        ),
       ),
-    ),
-  );
-}
-,
+    );
+  },
+  child: const Text("BOOK NOW"),
+),
 
-                child: const Text("BOOK NOW"),
-              ),
             ), const SizedBox(height: 20),
 
  Padding(

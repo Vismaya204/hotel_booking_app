@@ -7,7 +7,7 @@ class Payment extends StatefulWidget {
   final String hotelId;
   final String hotelName;
   final String hotelImage;
-  final int price;
+  final int price; // price per night
   final DateTime checkin;
   final DateTime checkout;
   final int guests;
@@ -24,7 +24,7 @@ class Payment extends StatefulWidget {
     required this.checkout,
     required this.guests,
     required this.rooms,
-     this.email,
+    this.email,
   });
 
   @override
@@ -32,14 +32,24 @@ class Payment extends StatefulWidget {
 }
 
 class _PaymentState extends State<Payment> {
-
   final ValueNotifier<String> selectedPay = ValueNotifier("gpay");
 
   final TextEditingController cardHolderCtrl = TextEditingController();
   final TextEditingController cardNumberCtrl = TextEditingController();
-  final TextEditingController expiryCtrl     = TextEditingController();
-  final TextEditingController cvvCtrl        = TextEditingController();
-bool _isLoading = false;
+  final TextEditingController expiryCtrl = TextEditingController();
+  final TextEditingController cvvCtrl = TextEditingController();
+
+  bool _isLoading = false;
+
+  /// ====== BOOKING CALCULATION (IMPORTANT) ======
+  int get nights {
+    final diff = widget.checkout.difference(widget.checkin).inDays;
+    return diff == 0 ? 1 : diff;
+  }
+
+  int get amount => widget.price * nights;
+  int get tax => (amount * 0.05).round();
+  int get total => amount + tax;
 
   @override
   Widget build(BuildContext context) {
@@ -61,14 +71,11 @@ bool _isLoading = false;
         ),
         centerTitle: true,
       ),
-
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-
-            // PRICE BOX
+            /// TOTAL PRICE BOX
             Container(
               padding: const EdgeInsets.all(25),
               decoration: BoxDecoration(
@@ -83,7 +90,7 @@ bool _isLoading = false;
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    "₹${widget.price}",
+                    "₹$total",
                     style: const TextStyle(
                       fontSize: 34,
                       color: Colors.blue,
@@ -103,10 +110,7 @@ bool _isLoading = false;
 
             const Text(
               "Payment method",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-              ),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
 
             const SizedBox(height: 20),
@@ -131,89 +135,122 @@ bool _isLoading = false;
 
             Row(
               children: [
-                Expanded(child: _inputField("Expiry date", "MM/YY", expiryCtrl)),
+                Expanded(
+                  child: _inputField("Expiry date", "MM/YY", expiryCtrl),
+                ),
                 const SizedBox(width: 15),
-                Expanded(child: _inputField("CVV", "***", cvvCtrl)),
+                Expanded(
+                  child: _inputField("CVV", "***", cvvCtrl),
+                ),
               ],
             ),
 
             const SizedBox(height: 30),
 
-           SizedBox(
-  width: double.infinity,
-  height: 55,
-  child: ElevatedButton(
-    style: ElevatedButton.styleFrom(
-      backgroundColor: Colors.blue,
-      foregroundColor: Colors.white,
-    ),
-    onPressed: _isLoading ? null : () async {
-      if (cardHolderCtrl.text.isEmpty ||
-          cardNumberCtrl.text.isEmpty ||
-          expiryCtrl.text.isEmpty ||
-          cvvCtrl.text.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Fill all fields")),
-        );
-        return;
-      }
-
-      final user = FirebaseAuth.instance.currentUser;
-      if (user == null) return;
-
-      setState(() => _isLoading = true);
-
-      try {
-        final uid = FirebaseAuth.instance.currentUser!.uid;
-
-        await FirebaseFirestore.instance
-            .collection("payments")
-            .doc(uid)
-            .collection("history")
-            .add({
-          "hotelName": widget.hotelName,
-          "hotelImage": widget.hotelImage,
-          "price": widget.price,
-          "paymentMethod": selectedPay.value,
-          "useremail": user.email,
-          "date": FieldValue.serverTimestamp(),
-        });
-
-        setState(() => _isLoading = false);
-
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const Success()),
-        );
-      } catch (e) {
-        setState(()=> _isLoading = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error: $e")),
-        );
-      }
-    },
-    child: _isLoading
-        ? const CircularProgressIndicator(color: Colors.white)
-        : const Text("PAY NOW", style: TextStyle(fontSize: 18)),
-  ),
-)
-
+            /// PAY NOW BUTTON
+            SizedBox(
+              width: double.infinity,
+              height: 55,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  foregroundColor: Colors.white,
+                ),
+                onPressed: _isLoading ? null : _handlePayment,
+                child: _isLoading
+                    ? const CircularProgressIndicator(color: Colors.white)
+                    : const Text(
+                        "PAY NOW",
+                        style: TextStyle(fontSize: 18),
+                      ),
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 
+  /// ====== HANDLE PAYMENT & SAVE SNAPSHOT ======
+  Future<void> _handlePayment() async {
+    if (cardHolderCtrl.text.isEmpty ||
+        cardNumberCtrl.text.isEmpty ||
+        expiryCtrl.text.isEmpty ||
+        cvvCtrl.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Fill all fields")),
+      );
+      return;
+    }
+
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    setState(() => _isLoading = true);
+
+    try {
+      final uid = user.uid;
+
+      await FirebaseFirestore.instance
+          .collection("payments")
+          .doc(uid)
+          .collection("history")
+          .add({
+        // USER
+        'userId': uid,
+        'userEmail': user.email,
+
+        // HOTEL
+        'hotelId': widget.hotelId,
+        'hotelName': widget.hotelName,
+        'hotelImage': widget.hotelImage,
+
+        // BOOKING SNAPSHOT (🔥 IMPORTANT)
+        'checkin': Timestamp.fromDate(widget.checkin),
+        'checkout': Timestamp.fromDate(widget.checkout),
+        'guests': widget.guests,
+        'rooms': widget.rooms,
+
+        // PRICE SNAPSHOT
+        'price': widget.price,
+        'nights': nights,
+        'tax': tax,
+        'total': total,
+
+        // PAYMENT INFO
+        'paymentMethod': selectedPay.value,
+        'createdAt': Timestamp.now(),
+      });
+
+      setState(() => _isLoading = false);
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const Success()),
+      );
+    } catch (e) {
+      setState(() => _isLoading = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error: $e")),
+      );
+    }
+  }
+
+  /// ====== INPUT FIELD ======
   Widget _inputField(
-      String title, String hint, TextEditingController controller) {
+    String title,
+    String hint,
+    TextEditingController controller,
+  ) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title,
-              style: const TextStyle(
-                  fontWeight: FontWeight.w600, fontSize: 15)),
+          Text(
+            title,
+            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+          ),
           const SizedBox(height: 4),
           TextField(
             controller: controller,
@@ -232,11 +269,10 @@ bool _isLoading = false;
     );
   }
 
+  /// ====== PAYMENT OPTION ======
   Widget payOption(String img, String id, String selected) {
     return GestureDetector(
-      onTap: () {
-        selectedPay.value = id;
-      },
+      onTap: () => selectedPay.value = id,
       child: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(

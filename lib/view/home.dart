@@ -4,7 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hotelbookingapp/view/alluserscreen.dart';
 import 'package:hotelbookingapp/view/hoteldetails.dart';
 import 'package:hotelbookingapp/view/profile.dart';
-import 'package:hotelbookingapp/view/selectuserdate.dart';
+
 
 class Home extends StatefulWidget {
   final String? location;
@@ -156,7 +156,7 @@ void initState() {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: IconButton(
-                      onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (context) => HotelSearchScreen(),));} ,
+                      onPressed: () {} ,
                       icon: const Icon(Icons.filter_list, color: Colors.white),
                     ),
                   ),

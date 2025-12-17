@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:hotelbookingapp/view/addroomdateils.dart';
 import 'package:hotelbookingapp/view/admin.dart';
 import 'package:hotelbookingapp/view/alluserscreen.dart';
+import 'package:hotelbookingapp/view/hotelsedits.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -338,23 +338,24 @@ class HotelBookingController extends ChangeNotifier {
           context,
           MaterialPageRoute(builder: (context) => Alluserscreen()),
         );
-      } else if (hotelDoc.exists) {
-        // ✅ Hotel login with admin approval check
-        String status = hotelDoc['status'] ?? 'pending';
+     } else if (hotelDoc.exists) {
+  String status = hotelDoc['status'] ?? 'pending';
 
-        if (status == 'approved') {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Hotel login successful")),
-          );
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => AddRoomScreen(
-                hotelId: hotelDoc['hotelId'],
-                
-              ),
-            ),
-          );
+  if (status == 'approved') {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Hotel login successful")),
+    );
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (_) => EditHotelandviewbooking(
+          hotelId: uid,
+          hotel: hotelDoc.data() as Map<String, dynamic>, // ✅ FIX
+        ),
+      ),
+    );
+
         } else if (status == 'pending') {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(

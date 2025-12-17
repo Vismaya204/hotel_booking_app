@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hotelbookingapp/view/Favourit.dart';
 import 'package:hotelbookingapp/view/alluserscreen.dart';
 import 'package:hotelbookingapp/view/paymenthistory.dart';
+import 'package:hotelbookingapp/view/register_login.dart';
 import 'package:hotelbookingapp/view/settings.dart';
 
 class Profile extends StatelessWidget {
@@ -21,10 +22,11 @@ class Profile extends StatelessWidget {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => Alluserscreen()),
-        );return false;
+        );
+        return false;
       },
       child: Scaffold(
-        backgroundColor: Colors.amber,
+        backgroundColor: Colors.black,
         appBar: AppBar(
           backgroundColor: Colors.amber,
           title: const Text(
@@ -65,19 +67,25 @@ class Profile extends StatelessWidget {
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Colors.black,
+                        color: Colors.white,
                       ),
                     ),
 
                     // Show Firestore email
-                    Text(email, style: const TextStyle(color: Colors.black)),
+                    Text(email, style: const TextStyle(color: Colors.white)),
 
                     const SizedBox(height: 30),
 
                     ListTile(
-                      tileColor: Colors.white,
-                      leading: const Icon(Icons.history),
-                      title: const Text("History"),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      tileColor: Colors.amber,
+                      leading: Icon(Icons.history, color: Colors.white),
+                      title: const Text(
+                        "History",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
                       trailing: GestureDetector(
                         onTap: () {
                           Navigator.push(
@@ -94,9 +102,15 @@ class Profile extends StatelessWidget {
                     SizedBox(height: 20),
 
                     ListTile(
-                      tileColor: Colors.white,
-                      leading: const Icon(Icons.favorite),
-                      title: const Text("Favourite"),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      tileColor: Colors.amber,
+                      leading: const Icon(Icons.favorite, color: Colors.white),
+                      title: const Text(
+                        "Favourite",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
                       trailing: GestureDetector(
                         onTap: () {
                           Navigator.push(
@@ -118,11 +132,35 @@ class Profile extends StatelessWidget {
                         );
                       },
                       child: ListTile(
-                        tileColor: Colors.white,
-                        leading: const Icon(Icons.settings),
-                        title: const Text("Settings"),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        tileColor: Colors.amber,
+                        leading: const Icon(
+                          Icons.settings,
+                          color: Colors.white,
+                        ),
+                        title: const Text(
+                          "Settings",
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
                         trailing: const Icon(Icons.arrow_forward_ios),
                       ),
+                    ),
+                    SizedBox(height: 20),
+                    ListTile(onTap: () {
+                      Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) => RegisterLogin(),) );
+                    },
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      tileColor: Colors.amber,
+                      leading: const Icon(Icons.logout, color: Colors.white),
+                      title: const Text(
+                        "Logout",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                     
                     ),
                   ],
                 ),
