@@ -2,12 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class Allbookingviewadmin extends StatelessWidget {
-  final String userId;
-
-  const Allbookingviewadmin({
-    super.key,
-    required this.userId,
-  });
+  const Allbookingviewadmin({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -15,127 +10,200 @@ class Allbookingviewadmin extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.amber,
         title: const Text(
-          "Booking Details",
+          "All Bookings - Admin",
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
-            .collection('payments')
-            .doc(userId)
-            .collection('history')
-            .orderBy('createdAt', descending: true)
+            .collectionGroup('history') // ✅ ADMIN QUERY
             .snapshots(),
         builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return Center(
+              child: Text(
+                "Error: ${snapshot.error}",
+                textAlign: TextAlign.center,
+              ),
+            );
+          }
+
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
 
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return const Center(child: Text("No booking found"));
+            return const Center(child: Text("No bookings found"));
           }
 
-          final data = snapshot.data!.docs.first.data() as Map<String, dynamic>;
-
-          final Timestamp? createdAt = data['createdAt'];
-          final Timestamp? checkinTs = data['checkin'];
-          final Timestamp? checkoutTs = data['checkout'];
-
-          final checkin = checkinTs?.toDate();
-          final checkout = checkoutTs?.toDate();
-
-          return SingleChildScrollView(
+          return ListView.builder(
             padding: const EdgeInsets.all(14),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+            itemCount: snapshot.data!.docs.length,
+            itemBuilder: (context, index) {
+              
+              final doc = snapshot.data!.docs[index];
+              final data = doc.data() as Map<String, dynamic>;
+          
 
-                /// HOTEL INFO
-                Row(
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: Image.network(
-                        data['hotelImage'] ?? '',
-                        width: 120,
-                        height: 90,
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) =>
-                            const Icon(Icons.image_not_supported),
+
+              /// SAFE TIMESTAMPS
+              final Timestamp? createdAt =
+                  data['createdAt'] is Timestamp ? data['createdAt'] : null;
+              final Timestamp? checkin =
+                  data['checkin'] is Timestamp ? data['checkin'] : null;
+              final Timestamp? checkout =
+                  data['checkout'] is Timestamp ? data['checkout'] : null;
+                 final num price = data['price'] ?? 0;
+  final int rooms = data['rooms'] ?? 1;
+  final num tax = data['tax'] ?? 0;
+
+  /// CALCULATION
+  final num subtotal = price * rooms;
+  final num totalPaid = subtotal + tax;
+
+
+              return Card(
+                elevation: 3,
+                margin: const EdgeInsets.only(bottom: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(14),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      /// HOTEL INFO
+                      Row(
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: data['hotelImage'] != null
+                                ? Image.network(
+                                    data['hotelImage'],
+                                    width: 120,
+                                    height: 90,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (_, __, ___) =>
+                                        const Icon(Icons.image_not_supported,
+                                            size: 60),
+                                  )
+                                : const Icon(Icons.image_not_supported,
+                                    size: 60),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              data['hotelName'] ?? "Hotel",
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        data['hotelName'] ?? 'Hotel',
-                        style: const TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                        ),
+
+                      const SizedBox(height: 10),
+
+                      /// USER INFO
+                      Text(
+                        "User Email: ${data['userEmail'] ?? 'Unknown'}",
+                        style: const TextStyle(fontSize: 14),
                       ),
-                    ),
-                  ],
-                ),
 
-                const SizedBox(height: 12),
-                Text("Price: ₹${data['price'] ?? 0} / night"),
+                      const SizedBox(height: 6),
 
-                const SizedBox(height: 20),
+                      /// BOOKING DETAILS
+                      Text("Guests: ${data['guests'] ?? 1}"),
+                      Text("Rooms: ${data['rooms'] ?? 1}"),
+                      Text("Nights: ${data['nights'] ?? 1}"),
 
-                /// BOOKING DETAILS
-                Text(
-                  "Booking Date: ${createdAt != null ? _formatDate(createdAt) : '-'}",
-                ),
-                Text(
-                  "Check-in: ${checkin != null ? _formatDate(checkinTs!) : '-'}",
-                ),
-                Text(
-                  "Check-out: ${checkout != null ? _formatDate(checkoutTs!) : '-'}",
-                ),
-                Text("Guests: ${data['guests'] ?? 1}"),
-                Text("Rooms: ${data['rooms'] ?? 1}"),
+                      const SizedBox(height: 6),
 
-                const Divider(height: 40),
+                      Text("Booking Date: ${_formatDate(createdAt)}"),
+                      Text("Check-in: ${_formatDate(checkin)}"),
+                      Text("Check-out: ${_formatDate(checkout)}"),
 
-                /// BILLING
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text("Amount"),
-                    Text("₹${data['price'] ?? 0} x ${data['nights'] ?? 1}"),
-                  ],
+                      const Divider(height: 24),
+
+                      /// BILLING
+                     /// BILLING
+/// BILLING
+Column(
+  crossAxisAlignment: CrossAxisAlignment.start,
+  children: [
+    const Text(
+      "Bill Details",
+      style: TextStyle(fontWeight: FontWeight.bold),
+    ),
+
+    const SizedBox(height: 6),
+
+    Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        const Text("Price"),
+        Text("₹$price"),
+      ],
+    ),
+
+    Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        const Text("Rooms"),
+        Text("$rooms"),
+      ],
+    ),
+
+    Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        const Text("Subtotal"),
+        Text("₹$subtotal"),
+      ],
+    ),
+
+    Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        const Text("Tax"),
+        Text("₹$tax"),
+      ],
+    ),
+
+    const Divider(height: 24),
+
+    Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        const Text(
+          "Total Paid",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        Text(
+          "₹$totalPaid",
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+      ],
+    ),
+  ],
+),
+
+                    ],
+                  ),
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text("Tax (5%)"),
-                    Text("₹${data['tax'] ?? 0}"),
-                  ],
-                ),
-                const SizedBox(height: 6),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      "Total",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    Text(
-                      "₹${data['total'] ?? 0}",
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-              ],
-            ),
+              );
+            },
           );
         },
       ),
     );
   }
 
-  static String _formatDate(Timestamp timestamp) {
-    final date = timestamp.toDate();
-    return "${date.day}-${date.month}-${date.year}";
+  static String _formatDate(Timestamp? timestamp) {
+    if (timestamp == null) return "-";
+    final d = timestamp.toDate();
+    return "${d.day}-${d.month}-${d.year}";
   }
 }

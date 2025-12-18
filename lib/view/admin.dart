@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hotelbookingapp/view/allbookingviewadmin.dart';
@@ -373,21 +372,27 @@ class AllBookingsScreen extends StatelessWidget {
           return ListView.builder(
             itemCount: docs.length,
             itemBuilder: (context, index) {
-              final data = docs[index].data() as Map<String, dynamic>;
+              final data =
+                  docs[index].data() as Map<String, dynamic>? ?? {};
+
+              /// 🔐 SAFE FETCH
+              // final totalPaid = data['totalAmount'] ??
+              //     data['totalPrice'] ??
+              //     data['price'] ??
+              //     0;
+
+              // final userEmail =
+              //     data['useremail'] ?? data['email'] ?? 'Unknown';
 
               return InkWell(
                 onTap: () {
-                Navigator.push(
-  context,
-  MaterialPageRoute(
-    builder: (_) => Allbookingviewadmin(
-      userId: FirebaseAuth.instance.currentUser!.uid,
-    ),
-  ),
-);
-
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const Allbookingviewadmin(),
+                    ),
+                  );
                 },
-
                 child: Card(
                   margin: const EdgeInsets.all(10),
                   child: Padding(
@@ -425,30 +430,28 @@ class AllBookingsScreen extends StatelessWidget {
 
                         const SizedBox(height: 10),
 
-                        /// 💼 Room
-                        if (data["room"] != null) Text("Room: ${data["room"]}"),
+                       
 
-                        /// 🔥 Price
-                        Text("Paid: ₹${data["price"]}"),
+                        /// 🔥 TOTAL PAID (CHANGED)
+                      
+                          Text("paid: ₹${data['total'] ?? 0}",
+                            
+                            style:
+                                const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                       
+                        /// 👤 USER EMAIL (CHANGED)
+                          Text(
+                        "User Email: ${data['userEmail'] ?? 'Unknown'}",
+                        style: const TextStyle(fontSize: 14),
+                      ),
 
-                        /// 🟡 Dates
-                        if (data["checkIn"] != null)
-                          Text("Check-in: ${data["checkIn"]}"),
-
-                        if (data["checkOut"] != null)
-                          Text("Check-out: ${data["checkOut"]}"),
-
-                        /// 👤 User
-                        Text("User: ${data["useremail"]}"),
 
                         const SizedBox(height: 8),
-
-                        /// 🔴 Cancel Button
-                      
                       ],
                     ),
                   ),
-                )
+                ),
               );
             },
           );
