@@ -387,11 +387,14 @@ class AllBookingsScreen extends StatelessWidget {
               return InkWell(
                 onTap: () {
                   Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const Allbookingviewadmin(),
-                    ),
-                  );
+  context,
+  MaterialPageRoute(
+    builder: (_) => Allbookingviewadmin(
+      hotelId: data['hotelId'],// 👈 pass hotelId
+    ),
+  ),
+);
+
                 },
                 child: Card(
                   margin: const EdgeInsets.all(10),

@@ -216,6 +216,7 @@ class _EditHotelandviewbooking extends State<EditHotelandviewbooking> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blue,
                 foregroundColor: Colors.white,
+                 minimumSize: Size(double.infinity, 45),
               ),
               onPressed: pickHotelImage,
               child: Text("Change hotel Image"),
