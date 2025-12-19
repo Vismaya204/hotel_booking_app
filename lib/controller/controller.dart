@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hotelbookingapp/view/admin.dart';
 import 'package:hotelbookingapp/view/alluserscreen.dart';
+import 'package:hotelbookingapp/view/hotel_allscr.dart';
 import 'package:hotelbookingapp/view/hotelsedits.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
@@ -349,10 +350,7 @@ class HotelBookingController extends ChangeNotifier {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (_) => EditHotelandviewbooking(
-          hotelId: uid,
-          hotel: hotelDoc.data() as Map<String, dynamic>, // ✅ FIX
-        ),
+        builder: (_) =>Hotelallscr()
       ),
     );
 

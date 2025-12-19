@@ -37,21 +37,30 @@ class _PaymenthistoryState extends State<Paymenthistory> {
               .collection("payments")
               .doc(uid)
               .collection("history")
-              .orderBy("date", descending: true)
               .snapshots(),
-          builder: (context, snap) {
-            if (snap.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            }
+        builder: (context, snap) {
+  if (snap.connectionState == ConnectionState.waiting) {
+    return const Center(child: CircularProgressIndicator());
+  }
 
-            if (!snap.hasData || snap.data!.docs.isEmpty) {
-              return const Center(
-                child: Text(
-                  "No Payment Found",
-                  style: TextStyle(fontSize: 18, color: Colors.grey),
-                ),
-              );
-            }
+  if (snap.hasError) {
+    return const Center(
+      child: Text(
+        "Failed to load payments",
+        style: TextStyle(color: Colors.red),
+      ),
+    );
+  }
+
+  if (!snap.hasData || snap.data!.docs.isEmpty) {
+    return const Center(
+      child: Text(
+        "No Payment Found",
+        style: TextStyle(fontSize: 18, color: Colors.grey),
+      ),
+    );
+  }
+
 
             final docs = snap.data!.docs;
 
@@ -77,7 +86,7 @@ class _PaymenthistoryState extends State<Paymenthistory> {
                         title: Text(data["hotelName"] ?? "No hotel"),
 
                         subtitle: Text(
-                          "Paid: ₹${data["price"] ?? 0}\nMethod: ${data["paymentMethod"] ?? ""}",
+                          "Paid: ₹${data["total"] ?? 0}\nMethod: ${data["paymentMethod"] ?? ""}",
                         ),
 
                         trailing: Text(

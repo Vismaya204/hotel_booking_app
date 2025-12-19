@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:hotelbookingapp/view/hoteladd.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:http/http.dart' as http;
@@ -178,114 +179,128 @@ class _EditHotelFullState extends State<EditHotelFull> {
   // -----------------------------------------------------------------
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(backgroundColor: Colors.amber, title: Text("Edit Hotel")),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // HOTEL MAIN IMAGE
-            ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: Image.network(
-                imageCtrl.text,
-                height: 200,
-                width: double.infinity,
-                fit: BoxFit.cover,
-              ),
-            ),
-
-            SizedBox(height: 10),
-
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
-                foregroundColor: Colors.white,
-              ),
-              onPressed: pickHotelImage,
-              child: Text("Change hotel Image"),
-            ),
-
-            SizedBox(height: 10),
-
-            Text("Hotel Name", style: TextStyle(fontWeight: FontWeight.bold)),
-            TextField(
-              controller: nameCtrl,
-              decoration: InputDecoration(
-                enabled: true,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
+    return WillPopScope(
+      onWillPop: () async{
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => Hoteladd()),
+        );return false;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.amber,
+          title: Text("Edit Hotel"),
+        ),
+        body: SingleChildScrollView(
+          padding: EdgeInsets.all(12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // HOTEL MAIN IMAGE
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.network(
+                  imageCtrl.text,
+                  height: 200,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
                 ),
               ),
-            ),
-            SizedBox(height: 12),
 
-            Text("Location", style: TextStyle(fontWeight: FontWeight.bold)),
-            TextField(
-              controller: locationCtrl,
-              decoration: InputDecoration(
-                enabled: true,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
+              SizedBox(height: 10),
+
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  foregroundColor: Colors.white,
                 ),
+                onPressed: pickHotelImage,
+                child: Text("Change hotel Image"),
               ),
-            ),
-            SizedBox(height: 12),
 
-            Text("Description", style: TextStyle(fontWeight: FontWeight.bold)),
-            TextField(
-              controller: descriptionCtrl,
-              maxLines: 4,
-              decoration: InputDecoration(
-                enabled: true,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-            ),
+              SizedBox(height: 10),
 
-            SizedBox(height: 20),
-
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
-                foregroundColor: Colors.white,
-                minimumSize: Size(double.infinity, 45),
-              ),
-              onPressed: updateHotel,
-              child: Text("SAVE HOTEL DETAILS"),
-            ),
-
-            SizedBox(height: 30),
-
-            Text(
-              "Rooms",
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 10),
-
-            loadingRooms
-                ? Center(child: CircularProgressIndicator())
-                : ListView.builder(
-                    shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
-                    itemCount: rooms.length,
-                    itemBuilder: (context, i) => roomCard(i),
+              Text("Hotel Name", style: TextStyle(fontWeight: FontWeight.bold)),
+              TextField(
+                controller: nameCtrl,
+                decoration: InputDecoration(
+                  enabled: true,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
                   ),
-
-            SizedBox(height: 20),
-
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
-                foregroundColor: Colors.white,
-                minimumSize: Size(double.infinity, 45),
+                ),
               ),
-              onPressed: addRoomDialog,
-              child: Text("ADD NEW ROOM"),
-            ),
-          ],
+              SizedBox(height: 12),
+
+              Text("Location", style: TextStyle(fontWeight: FontWeight.bold)),
+              TextField(
+                controller: locationCtrl,
+                decoration: InputDecoration(
+                  enabled: true,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
+              SizedBox(height: 12),
+
+              Text(
+                "Description",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              TextField(
+                controller: descriptionCtrl,
+                maxLines: 4,
+                decoration: InputDecoration(
+                  enabled: true,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
+
+              SizedBox(height: 20),
+
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  foregroundColor: Colors.white,
+                  minimumSize: Size(double.infinity, 45),
+                ),
+                onPressed: updateHotel,
+                child: Text("SAVE HOTEL DETAILS"),
+              ),
+
+              SizedBox(height: 30),
+
+              Text(
+                "Rooms",
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 10),
+
+              loadingRooms
+                  ? Center(child: CircularProgressIndicator())
+                  : ListView.builder(
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemCount: rooms.length,
+                      itemBuilder: (context, i) => roomCard(i),
+                    ),
+
+              SizedBox(height: 20),
+
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  foregroundColor: Colors.white,
+                  minimumSize: Size(double.infinity, 45),
+                ),
+                onPressed: addRoomDialog,
+                child: Text("ADD NEW ROOM"),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -372,9 +387,15 @@ class _EditHotelFullState extends State<EditHotelFull> {
 
             SizedBox(height: 10),
 
-            Text("Price", style: TextStyle(color: Colors.green,fontWeight: FontWeight.bold)),
+            Text(
+              "Price",
+              style: TextStyle(
+                color: Colors.green,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             TextField(
-               keyboardType: TextInputType.number,
+              keyboardType: TextInputType.number,
               onChanged: (val) {
                 rooms[index]["price"] = val;
               },
@@ -427,10 +448,7 @@ class _EditHotelFullState extends State<EditHotelFull> {
             onPressed: () => Navigator.pop(context),
             child: Text(
               "Cancel",
-              style: TextStyle(
-                
-                color: Colors.red,fontWeight: FontWeight.bold
-              ),
+              style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
             ),
           ),
           TextButton(
@@ -459,8 +477,8 @@ class _EditHotelFullState extends State<EditHotelFull> {
             child: Text(
               "Pick Image",
               style: TextStyle(
-                
-                color: Colors.green,fontWeight: FontWeight.bold
+                color: Colors.green,
+                fontWeight: FontWeight.bold,
               ),
             ),
           ),
@@ -490,7 +508,11 @@ class _EditHotelFullState extends State<EditHotelFull> {
                   decoration: InputDecoration(labelText: "Price"),
                 ),
                 SizedBox(height: 10),
-                ElevatedButton(style: ElevatedButton.styleFrom(backgroundColor: Colors.blue,foregroundColor: Colors.white),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                  ),
                   onPressed: () async {
                     pickedImage = await picker.pickImage(
                       source: ImageSource.gallery,
@@ -506,7 +528,7 @@ class _EditHotelFullState extends State<EditHotelFull> {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: Text("Cancel",style: TextStyle(color: Colors.red),),
+                child: Text("Cancel", style: TextStyle(color: Colors.red)),
               ),
               TextButton(
                 onPressed: () async {
@@ -533,7 +555,13 @@ class _EditHotelFullState extends State<EditHotelFull> {
                   Navigator.pop(context);
                   fetchRooms();
                 },
-                child: Text("ADD",style: TextStyle(color: Colors.green,fontWeight: FontWeight.bold),),
+                child: Text(
+                  "ADD",
+                  style: TextStyle(
+                    color: Colors.green,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
             ],
           );

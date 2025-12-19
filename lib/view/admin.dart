@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hotelbookingapp/view/allbookingviewadmin.dart';
-import 'package:hotelbookingapp/view/edithotelscreenadmin.dart';
+import 'package:hotelbookingapp/view/edithotelscreen.dart';
+import 'package:hotelbookingapp/view/hoteldetails.dart';
 
 
 class AdminDashboard extends StatefulWidget {
@@ -501,10 +502,7 @@ class AdminApprovedHotels extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) =>EditHotelFull(
-                        hotelId: snapshot.data!.docs[index].id,
-                        hotel: hotel,
-                      ),
+                      builder: (context) =>Hoteldetails( hotelId: snapshot.data!.docs[index].id, hotel: hotel)
                     ),
                   );
                 },
@@ -578,22 +576,9 @@ class AdminApprovedHotels extends StatelessWidget {
       child: Text("Reject"),
     ),
 
-    SizedBox(width: 50),
+    
 
-    IconButton(
-      onPressed: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => EditHotelFull(
-              hotelId: snapshot.data!.docs[index].id,
-              hotel: hotel,
-            ),
-          ),
-        );
-      },
-      icon: Icon(Icons.edit, color: Colors.black),
-    ),
+    
   ],
 )
 
