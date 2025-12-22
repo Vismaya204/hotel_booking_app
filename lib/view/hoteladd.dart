@@ -216,7 +216,7 @@ Row(
 
     return WillPopScope(
       onWillPop: () async{
-        Navigator.pushReplacement(
+        Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => Hotelallscr()),
         );

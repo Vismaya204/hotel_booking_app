@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hotelbookingapp/view/hotel_allscr.dart';
+import 'package:hotelbookingapp/view/hoteladd.dart';
+import 'package:hotelbookingapp/view/hotelview_all_bookings.dart';
 import 'package:hotelbookingapp/view/register_login.dart';
 
 class Hotelprofile extends StatelessWidget {
@@ -103,7 +105,7 @@ class Hotelprofile extends StatelessWidget {
                         const Icon(Icons.book, color: Colors.black),
                     title: const Text("All bookings",
                         style: TextStyle(color: Colors.black)),
-                    onTap: () {
+                    onTap: () {Navigator.push(context, MaterialPageRoute(builder: (context) => HotelPaymentsHistory(hotelId: hotelId),));
                       // navigate to bookings page
                     },
                   ),
@@ -111,7 +113,9 @@ class Hotelprofile extends StatelessWidget {
                   const SizedBox(height: 20),
 
                   /// HOTEL ADD
-                  ListTile(
+                  ListTile(onTap: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => Hoteladd(),));
+                  },
                     tileColor: Colors.amber,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
