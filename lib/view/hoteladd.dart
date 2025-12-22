@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:hotelbookingapp/view/hotel_allscr.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 
@@ -61,6 +62,8 @@ class _HoteladdState extends State<Hoteladd> {
   void addRoomDialog(String hotelId) {
     TextEditingController priceCtrl = TextEditingController();
     XFile? pickedImage;
+    bool isAvailable = true;
+
 
     showDialog(
       context: context,
@@ -77,7 +80,33 @@ class _HoteladdState extends State<Hoteladd> {
                     keyboardType: TextInputType.number,
                     decoration: const InputDecoration(labelText: "Price"),
                   ),
+                
                   const SizedBox(height: 12),
+
+Row(
+  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  children: [
+    Text(
+      isAvailable ? "Available" : "Unavailable",
+      style: TextStyle(
+        fontWeight: FontWeight.bold,
+        color: isAvailable ? Colors.green : Colors.red,
+      ),
+    ),
+    Switch(
+      value: isAvailable,
+      activeColor: Colors.green,
+      inactiveThumbColor: Colors.red,
+      inactiveTrackColor: Colors.red.shade200,
+      onChanged: (val) {
+        setSB(() {
+          isAvailable = val;
+        });
+      },
+    ),
+  ],
+),
+
 
                   // 🔥 IMAGE PREVIEW
                   if (pickedImage != null)
@@ -143,14 +172,15 @@ class _HoteladdState extends State<Hoteladd> {
                   }
 
                   await FirebaseFirestore.instance
-                      .collection("hotels")
-                      .doc(hotelId)
-                      .collection("rooms")
-                      .add({
-                        "price": priceCtrl.text,
-                        "images": [url],
-                        "createdAt": Timestamp.now(),
-                      });
+    .collection("hotels")
+    .doc(hotelId)
+    .collection("rooms")
+    .add({
+      "price": priceCtrl.text,
+      "images": [url],
+      "available": isAvailable, // ✅ STORE
+      "createdAt": Timestamp.now(),
+    });
 
                   Navigator.pop(context);
 
@@ -184,107 +214,118 @@ class _HoteladdState extends State<Hoteladd> {
       return const Scaffold(body: Center(child: Text("User not logged in")));
     }
 
-    return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => addRoomDialog(user.uid),
-        child: const Icon(Icons.add),
-      ),
-      appBar: AppBar(
-        backgroundColor: Colors.amber,
-        title: const Text("Hotel Details"),
-        centerTitle: true,
-      ),
-      body: StreamBuilder<DocumentSnapshot>(
-        stream: FirebaseFirestore.instance
-            .collection("hotels")
-            .doc(user.uid)
-            .snapshots(),
-        builder: (context, snap) {
-          if (snap.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
+    return WillPopScope(
+      onWillPop: () async{
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => Hotelallscr()),
+        );
+        return false;
+      },
+      child: Scaffold(
+        floatingActionButton: FloatingActionButton(
+          onPressed: () => addRoomDialog(user.uid),
+          child: const Icon(Icons.add),
+        ),
+        appBar: AppBar(
+          backgroundColor: Colors.amber,
+          title: const Text("Hotel Details"),
+          centerTitle: true,
+        ),
+        body: StreamBuilder<DocumentSnapshot>(
+          stream: FirebaseFirestore.instance
+              .collection("hotels")
+              .doc(user.uid)
+              .snapshots(),
+          builder: (context, snap) {
+            if (snap.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
 
-          if (!snap.hasData || !snap.data!.exists) {
-            return Center(
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          EditHotelFull(hotelId: user.uid, hotel: {}),
-                    ),
-                  );
-                },
-                child: const Text("Add Hotel Details"),
-              ),
-            );
-          }
-
-          final data = snap.data!.data() as Map<String, dynamic>;
-
-          return Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Image.network(
-                    data["image"] ?? "",
-                    height: 200,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) =>
-                        Container(height: 200, color: Colors.grey),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  data["name"] ?? "Hotel",
-                  style: const TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
-                  ),
+            if (!snap.hasData || !snap.data!.exists) {
+              return Center(
+                child: ElevatedButton(
                   onPressed: () {
-                    Navigator.push(
+                    Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                        builder: (_) =>
-                            EditHotelFull(hotelId: user.uid, hotel: data),
+                        builder: (context) =>
+                            EditHotelFull(hotelId: user.uid, hotel: {}),
                       ),
                     );
                   },
-                  child: const Text("Edit Hotel"),
+                  child: const Text("Add Hotel Details"),
                 ),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
+              );
+            }
+
+            final data = snap.data!.data() as Map<String, dynamic>;
+
+            return Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.network(
+                      data["image"] ?? "",
+                      height: 200,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) =>
+                          Container(height: 200, color: Colors.grey),
+                    ),
                   ),
-                  onPressed: () async {
-                    await FirebaseFirestore.instance
-                        .collection("hotels")
-                        .doc(user.uid)
-                        .update({"status": "rejected"});
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Hotel moved to rejected")),
-                    );
-                  },
-                  child: const Text("Reject"),
-                ),
-              ],
-            ),
-          );
-        },
+                  const SizedBox(height: 16),
+                  Text(
+                    data["name"] ?? "Hotel",
+                    style: const TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      foregroundColor: Colors.white,
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              EditHotelFull(hotelId: user.uid, hotel: data),
+                        ),
+                      );
+                    },
+                    child: const Text("Edit Hotel"),
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                    ),
+                    onPressed: () async {
+                      await FirebaseFirestore.instance
+                          .collection("hotels")
+                          .doc(user.uid)
+                          .update({"status": "rejected"});
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Hotel moved to rejected"),
+                        ),
+                      );
+                    },
+                    child: const Text("Reject"),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
       ),
     );
   }

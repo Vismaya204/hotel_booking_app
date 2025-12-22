@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hotelbookingapp/view/allbookingviewadmin.dart';
-import 'package:hotelbookingapp/view/edithotelscreen.dart';
 import 'package:hotelbookingapp/view/hoteldetails.dart';
 
 
@@ -390,7 +389,7 @@ class AllBookingsScreen extends StatelessWidget {
                   Navigator.push(
   context,
   MaterialPageRoute(
-    builder: (_) => Allbookingviewadmin(
+    builder: (_) => Allbookingviewadmin(userEmail:  data['userEmail'],  
       hotelId: data['hotelId'],// 👈 pass hotelId
     ),
   ),

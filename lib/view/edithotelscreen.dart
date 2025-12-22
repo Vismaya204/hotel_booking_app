@@ -45,24 +45,24 @@ class _EditHotelFullState extends State<EditHotelFull> {
   // 🔥 FETCH ROOMS
   // -----------------------------------------------------------------
   Future<void> fetchRooms() async {
-    final snap = await FirebaseFirestore.instance
-        .collection("hotels")
-        .doc(widget.hotelId)
-        .collection("rooms")
-        .get();
+  final snap = await FirebaseFirestore.instance
+      .collection("hotels")
+      .doc(widget.hotelId)
+      .collection("rooms")
+      .get();
 
-    rooms = snap.docs
-        .map(
-          (e) => {
-            "id": e.id,
-            "price": e["price"],
-            "images": List<String>.from(e["images"]),
-          },
-        )
-        .toList();
+  rooms = snap.docs.map((e) {
+    final data = e.data();
+    return {
+      "id": e.id,
+      "price": data["price"],
+      "images": List<String>.from(data["images"] ?? []),
+      "available": data["available"] ?? true, // ✅ DEFAULT
+    };
+  }).toList();
 
-    setState(() => loadingRooms = false);
-  }
+  setState(() => loadingRooms = false);
+}
 
   // -----------------------------------------------------------------
   // 🔥 CLOUDINARY UPLOAD
@@ -146,19 +146,24 @@ class _EditHotelFullState extends State<EditHotelFull> {
   // 📌 SAVE ROOM
   // -----------------------------------------------------------------
   Future<void> updateRoom(int index) async {
-    final room = rooms[index];
+  final room = rooms[index];
 
-    await FirebaseFirestore.instance
-        .collection("hotels")
-        .doc(widget.hotelId)
-        .collection("rooms")
-        .doc(room["id"])
-        .update({"price": room["price"], "images": room["images"]});
+  await FirebaseFirestore.instance
+      .collection("hotels")
+      .doc(widget.hotelId)
+      .collection("rooms")
+      .doc(room["id"])
+      .update({
+    "price": room["price"],
+    "images": room["images"],
+    "available": room["available"], // ✅ SAVE
+  });
 
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text("Room Updated")));
-  }
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(content: Text("Room Updated")),
+  );
+}
+
 
   // -----------------------------------------------------------------
   // ❌ DELETE ROOM
@@ -318,10 +323,37 @@ class _EditHotelFullState extends State<EditHotelFull> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "Room ${index + 1}",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 8),
+                  "Room ${index + 1}",
+                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+             ),
+
+SizedBox(height: 6),
+            Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  children: [
+    Text(
+      rooms[index]["available"] ? "Available" : "Unavailable",
+      style: TextStyle(
+        fontWeight: FontWeight.bold,
+        color: rooms[index]["available"] ? Colors.green : Colors.red,
+      ),
+    ),
+    Switch(
+      value: rooms[index]["available"],
+      activeColor: Colors.green,
+      inactiveThumbColor: Colors.red,
+      inactiveTrackColor: Colors.red.shade200,
+      onChanged: (val) {
+        setState(() {
+          rooms[index]["available"] = val;
+        });
+        updateRoom(index);
+      },
+    ),
+  ],
+),
+
+
 
             // ROOM IMAGES
             SizedBox(
@@ -387,22 +419,24 @@ class _EditHotelFullState extends State<EditHotelFull> {
 
             SizedBox(height: 10),
 
-            Text(
-              "Price",
-              style: TextStyle(
-                color: Colors.green,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            TextField(
-              keyboardType: TextInputType.number,
-              onChanged: (val) {
-                rooms[index]["price"] = val;
-              },
-              controller: TextEditingController(
-                text: rooms[index]["price"].toString(),
-              ),
-            ),
+           Text(
+  "Price",
+  style: TextStyle(
+    color: Colors.green,
+    fontWeight: FontWeight.bold,
+  ),
+),
+
+TextFormField(
+  initialValue: rooms[index]["price"].toString(),
+  keyboardType: TextInputType.number,
+  decoration: InputDecoration(
+    border: OutlineInputBorder(),
+  ),
+  onChanged: (val) {
+    rooms[index]["price"] = val;
+  },
+),
 
             SizedBox(height: 10),
 
@@ -543,14 +577,16 @@ class _EditHotelFullState extends State<EditHotelFull> {
                     url = await uploadImageToCloudinary(pickedImage);
                   }
 
-                  await FirebaseFirestore.instance
-                      .collection("hotels")
-                      .doc(widget.hotelId)
-                      .collection("rooms")
-                      .add({
-                        "price": priceCtrl.text,
-                        "images": [url],
-                      });
+                 await FirebaseFirestore.instance
+    .collection("hotels")
+    .doc(widget.hotelId)
+    .collection("rooms")
+    .add({
+  "price": priceCtrl.text,
+  "images": [url],
+  "available": true, // ✅ DEFAULT
+});
+
 
                   Navigator.pop(context);
                   fetchRooms();

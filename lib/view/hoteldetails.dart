@@ -29,33 +29,39 @@ class _HoteldetailsState extends State<Hoteldetails> {
     fetchRoomImages();
   }
 
-  Future<void> fetchRoomImages() async {
-    try {
-      final roomsSnapshot = await FirebaseFirestore.instance
-          .collection("hotels")
-          .doc(widget.hotelId)
-          .collection("rooms")
-          .get();
+ Future<void> fetchRoomImages() async {
+  try {
+    final roomsSnapshot = await FirebaseFirestore.instance
+        .collection("hotels")
+        .doc(widget.hotelId)
+        .collection("rooms")
+        .get();
 
-      List<Map<String, dynamic>> temp = [];
+    List<Map<String, dynamic>> temp = [];
 
-      for (var room in roomsSnapshot.docs) {
-        List images = room["images"] ?? [];
-        String price = room["price"].toString(); // ⭐ assume each room has price
+    for (var room in roomsSnapshot.docs) {
+      final data = room.data();
+      List images = data["images"] ?? [];
+      String price = data["price"].toString();
+      bool available = data["available"] ?? false;
 
-        for (var img in images) {
-          temp.add({"image": img.toString(), "price": price});
-        }
+      for (var img in images) {
+        temp.add({
+          "image": img.toString(),
+          "price": price,
+          "available": available,
+        });
       }
-
-      setState(() {
-        allRooms = temp;
-        loadingRooms = false;
-      });
-    } catch (e) {
-      print("Room Load Error: $e");
     }
+
+    setState(() {
+      allRooms = temp;
+      loadingRooms = false;
+    });
+  } catch (e) {
+    print("Room Load Error: $e");
   }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -171,17 +177,49 @@ class _HoteldetailsState extends State<Hoteldetails> {
                               selectedRoomPrice = room["price"];
                             });
                           },
-                          child: Container(
-                            margin: const EdgeInsets.all(8),
-                            width: 180,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(12),
-                              image: DecorationImage(
-                                image: NetworkImage(room["image"]),
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          ),
+                        child: Container(
+  margin: const EdgeInsets.all(8),
+  width: 180,
+  child: Stack(
+    children: [
+      // ROOM IMAGE
+      ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: Image.network(
+          room["image"],
+          width: 180,
+          height: 200,
+          fit: BoxFit.cover,
+        ),
+      ),
+
+      // 🔴🟢 AVAILABILITY BADGE
+      Positioned(
+        top: 8,
+        left: 8,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: room["available"]
+                ? Colors.green.withOpacity(0.85)
+                : Colors.red.withOpacity(0.85),
+            borderRadius: BorderRadius.circular(6),
+          ),
+          child: Text(
+            room["available"] ? "Available" : "Unavailable",
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 12,
+            ),
+          ),
+        ),
+      ),
+    ],
+  ),
+),
+
+
                         );
                       },
                     ),
