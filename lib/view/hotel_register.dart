@@ -13,12 +13,16 @@ class HotelRegisterScreen extends StatefulWidget {
 }
 
 class _HotelRegisterScreenState extends State<HotelRegisterScreen> {
+  final _formKey = GlobalKey<FormState>();
+
   final TextEditingController hotelNameController = TextEditingController();
   final TextEditingController locationController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController discount=TextEditingController();
-  final TextEditingController description=TextEditingController();
+  final TextEditingController discount = TextEditingController();
+  final TextEditingController description = TextEditingController();
+
+  bool _isPasswordVisible = false;
 
   @override
   Widget build(BuildContext context) {
@@ -27,189 +31,221 @@ class _HotelRegisterScreenState extends State<HotelRegisterScreen> {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        iconTheme: IconThemeData(color: Colors.amber),
+        iconTheme: const IconThemeData(color: Colors.amber),
         backgroundColor: Colors.black,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                "Register",
-                style: TextStyle(
-                  fontSize: 30,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.amber,
-                ),
-              ),SizedBox(height: 30,),
-              TextField(
-                style: TextStyle(color: Colors.white),
-                controller: hotelNameController,
-                decoration: InputDecoration(
-                  hintText: "Hotel Name",
-                  hintStyle: TextStyle(color: Colors.white),
-                  enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.amber),
-                    borderRadius: BorderRadius.circular(10),
-                  ),focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.amber),
-                  ),
-                ),cursorColor: Colors.amber,
-              ),
-              SizedBox(height: 10),
-              TextField(
-                style: TextStyle(color: Colors.white),
-                controller: locationController,
-                decoration: InputDecoration(
-                  hintText: "Location",
-                  hintStyle: TextStyle(color: Colors.white),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),borderSide: BorderSide(color: Colors.amber),
-                  ),focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.amber),
-                  ),
-                ),cursorColor: Colors.amber,
-              ),
-              SizedBox(height: 10),
-              TextField(
-                style: TextStyle(color: Colors.white),
-                controller: emailController,
-                decoration: InputDecoration(
-                  hintText: "Email",
-                  hintStyle: TextStyle(color: Colors.white),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: Colors.amber),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.amber),
-                  ),
-                ),cursorColor: Colors.amber,
-              ),
-              SizedBox(height: 10),
-              TextField(
-                style: TextStyle(color: Colors.white),
-                controller: passwordController,
-                obscureText: true,
-                decoration: InputDecoration(
-                  hintText: "Password",
-                  hintStyle: TextStyle(color: Colors.white),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: Colors.amber),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.amber),
-                  ),
-                ),cursorColor: Colors.amber,
-              ),SizedBox(height: 10,),
-              TextField(controller:description ,maxLines: 4,
-                style: TextStyle(color: Colors.white),
-                decoration: InputDecoration(hintText: "Descritipon",hintStyle: TextStyle(color: Colors.white),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: Colors.amber),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.amber),
-                  ),
-                ),cursorColor: Colors.amber,
-              ),SizedBox(height: 10,),
-               TextField(controller: discount,
-                style: TextStyle(color: Colors.white),
-                decoration: InputDecoration(hintText: "Discount",hintStyle: TextStyle(color: Colors.white),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: Colors.amber),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.amber),
-                  ),
-                ),cursorColor: Colors.amber,
-              ),
-              SizedBox(height: 20),
-
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: SizedBox(
-                  height: 50,
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.amber,
-                      foregroundColor: Colors.black,
-                    ),
-                    onPressed: () async {
-                      await controller.pickHotelImage();
-                    },
-                    child: const Text("Upload Proof of Hotel"),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  "Register",
+                  style: TextStyle(
+                    fontSize: 30,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.amber,
                   ),
                 ),
-              ),
+                const SizedBox(height: 30),
 
-              SizedBox(height: 10),
+                // Hotel Name
+                TextFormField(
+                  style: const TextStyle(color: Colors.white),
+                  controller: hotelNameController,
+                  decoration: _inputDecoration("Hotel Name"),
+                  cursorColor: Colors.amber,
+                  validator: (value) =>
+                      value == null || value.isEmpty ? "Hotel name required" : null,
+                ),
+                const SizedBox(height: 10),
 
-              // Preview selected image
-              if (controller.hotelImage != null ||
-                  controller.webImageBytes != null)
-                kIsWeb && controller.webImageBytes != null
-                    ? Image.memory(
-                        controller.webImageBytes!,
-                        height: 150,
-                        fit: BoxFit.cover,
-                      )
-                    : Image.file(
-                        File(controller.hotelImage!.path),
-                        height: 150,
-                        fit: BoxFit.cover,
+                // Location
+                TextFormField(
+                  style: const TextStyle(color: Colors.white),
+                  controller: locationController,
+                  decoration: _inputDecoration("Location"),
+                  cursorColor: Colors.amber,
+                  validator: (value) =>
+                      value == null || value.isEmpty ? "Location required" : null,
+                ),
+                const SizedBox(height: 10),
+
+                // Email
+                TextFormField(
+                  style: const TextStyle(color: Colors.white),
+                  controller: emailController,
+                  decoration: _inputDecoration("Email"),
+                  cursorColor: Colors.amber,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return "Email required";
+                    }
+                    final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+                    if (!emailRegex.hasMatch(value)) {
+                      return "Enter a valid email";
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 10),
+
+                // Password with toggle + validation
+                TextFormField(
+                  style: const TextStyle(color: Colors.white),
+                  controller: passwordController,
+                  obscureText: !_isPasswordVisible,
+                  decoration: _inputDecoration("Password").copyWith(
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _isPasswordVisible
+                            ? Icons.visibility
+                            : Icons.visibility_off,
+                        color: Colors.amber,
                       ),
-
-              SizedBox(height: 20),
-
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: SizedBox(
-                  height: 50,
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.amber,
-                      foregroundColor: Colors.black,
-                      minimumSize: const Size(double.infinity, 50),
+                      onPressed: () {
+                        setState(() {
+                          _isPasswordVisible = !_isPasswordVisible;
+                        });
+                      },
                     ),
-                    onPressed: () async {
-                      final hotel = HotelAppModel(
-                        hotelId: "",
-                        name: hotelNameController.text,
-                        email: emailController.text,
-                        password: passwordController.text,
-                        location: locationController.text,
-                        discount: discount.text,
-                        description: description.text
-                      );
+                  ),
+                  cursorColor: Colors.amber,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return "Password required";
+                    } else if (value.length < 6) {
+                      return "Password must be at least 6 characters";
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 10),
 
-                      await controller.hotelRegister(
-                        hotel: hotel,
-                        context: context,
-                      );
-                        /// after success clear fields
-  hotelNameController.clear();
-  locationController.clear();
-  emailController.clear();
-  passwordController.clear();
-  discount.clear();
-  description.clear();
+                // Description
+                TextFormField(
+                  controller: description,
+                  maxLines: 4,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: _inputDecoration("Description"),
+                  cursorColor: Colors.amber,
+                  validator: (value) =>
+                      value == null || value.isEmpty ? "Description required" : null,
+                ),
+                const SizedBox(height: 10),
 
- 
-                    },
-                    child: const Text("Register"),
+                // Discount
+                TextFormField(
+                  controller: discount,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: _inputDecoration("Discount"),
+                  cursorColor: Colors.amber,
+                  validator: (value) =>
+                      value == null || value.isEmpty ? "Discount required" : null,
+                ),
+                const SizedBox(height: 20),
+
+                // Upload Proof Button
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: SizedBox(
+                    height: 50,
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.amber,
+                        foregroundColor: Colors.black,
+                      ),
+                      onPressed: () async {
+                        await controller.pickHotelImage();
+                      },
+                      child: const Text("Upload Proof of Hotel"),
+                    ),
                   ),
                 ),
-              ),
-            ],
+
+                const SizedBox(height: 10),
+
+                // Preview selected image
+                if (controller.hotelImage != null ||
+                    controller.webImageBytes != null)
+                  kIsWeb && controller.webImageBytes != null
+                      ? Image.memory(
+                          controller.webImageBytes!,
+                          height: 150,
+                          fit: BoxFit.cover,
+                        )
+                      : Image.file(
+                          File(controller.hotelImage!.path),
+                          height: 150,
+                          fit: BoxFit.cover,
+                        ),
+
+                const SizedBox(height: 20),
+
+                // Register Button
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: SizedBox(
+                    height: 50,
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.amber,
+                        foregroundColor: Colors.black,
+                        minimumSize: const Size(double.infinity, 50),
+                      ),
+                      onPressed: () async {
+                        if (_formKey.currentState!.validate()) {
+                          final hotel = HotelAppModel(
+                            hotelId: "",
+                            name: hotelNameController.text,
+                            email: emailController.text,
+                            password: passwordController.text,
+                            location: locationController.text,
+                            discount: discount.text,
+                            description: description.text,
+                          );
+
+                          await controller.hotelRegister(
+                            hotel: hotel,
+                            context: context,
+                          );
+
+                          // Clear fields after success
+                          hotelNameController.clear();
+                          locationController.clear();
+                          emailController.clear();
+                          passwordController.clear();
+                          discount.clear();
+                          description.clear();
+                        }
+                      },
+                      child: const Text("Register"),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
+      ),
+    );
+  }
+
+  InputDecoration _inputDecoration(String hint) {
+    return InputDecoration(
+      hintText: hint,
+      hintStyle: const TextStyle(color: Colors.white),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: const BorderSide(color: Colors.amber),
+      ),
+      focusedBorder: const OutlineInputBorder(
+        borderSide: BorderSide(color: Colors.amber),
       ),
     );
   }
